@@ -1,10 +1,20 @@
 const tf = require('@tensorflow/tfjs-node');
+const PorterStemmer = require('porter-stemmer').PorterStemmer;
 
 const xs_train = tf.tensor2d([1, 2, 3, 4], [4, 1]);
 const ys_train = tf.tensor2d([1, 1, 0, 0], [4, 1]);
 
 const xs_test = tf.tensor2d([1, 3, 5], [3, 1]);
 const ys_test = tf.tensor2d([1, 0, 0], [3, 1]);
+
+function tokenize(text) {
+    return text.split(" ");
+}
+
+function stem(word) {
+  const porterStemmer = new PorterStemmer();
+  return porterStemmer.stem(text);
+}
 
 async function train() {
     const model = tf.sequential();
