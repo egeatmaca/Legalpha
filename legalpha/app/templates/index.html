@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+  <head>
+    <title>Legalpha - Chatbot for tenancy law questions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href={% static "style.css" %} /> 
+    <script src={% static "script.js" %}></script>
+  </head>
+  <body>
+    <div class="header">
+        <h1> Legalpha - Chatbot for tenancy law questions </h1>
+    </div>
+    <div class="chat">
+        <div class="messages">
+            <div class="message">
+                <p> 
+                    Hi, I'm Legalpha. 👋 I'm here to help you with your questions about tenancy law in Germany. <br/>
+                    I try to answer legal questions in easy to understand plain English. <br/>
+                    However, please keep in mind I'm not a lawyer and I can't give you legal advice. <br/>
+                    Always double check my answers with the reference paragraphs I provide. <br/>
+                    For legal advice, please contact a lawyer. <br/>
+                </p>
+            </div>
+        </div>
+        <div class="input">
+            <input id='input-text' type="text" placeholder="Type your question here..." />
+            <input id='ask-button' type="submit" value="Ask!" />
+        </div> 
+    </div>
+  </body>
+</html>
