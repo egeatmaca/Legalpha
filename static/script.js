@@ -1,20 +1,21 @@
-function onAsk() {
+async function onAsk() {
     const inputText = document.getElementById("input-text");
+    const input = inputText.value;
+    inputText.value = "";
     
-    if (inputText.value.trim() == "") {
-        return
+    if (input.trim() == "") {
+      return;
     }
 
     const messages = document.querySelector(".messages");
     const message = document.createElement("div");
     message.classList.add("message");
     message.classList.add("user-message");
-    message.innerText = inputText.value;
+    message.innerText = input;
     messages.appendChild(message);
-    inputText.value = "";
 
-    // TODO: Switch to the chatbot's response
-    const responseText = "Hello, I'm a chatbot!";
+    const response = await fetch("/answer?question="+input)
+    const responseText = await response.text();
     
     const responseMessage = document.createElement("div");
     responseMessage.classList.add("message");
@@ -34,5 +35,4 @@ function initialize() {
 }
 
 document.addEventListener("DOMContentLoaded", initialize);
-predictIntent("Hello");
 
