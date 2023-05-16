@@ -1,10 +1,20 @@
 id,text,answer_id
-0,How to terminate my contact?,0
-1,How to terminate my unlimited contract?,1
-2,How to terminate my limited contract?,2
-3,How to terminate my staggered rental agreement?,3
-4,I have found a new tenant. How can I terminate my contract?,4
-5,What are the important reasons to terminate a contract by finding a new tenant?,5
-6,I want to terminate my contract and found a new tenant. The landlord doesn’t accept the new tenant. What can I do?,6
-7,I found a new tenant to terminate my contract. Can the landloard increase the rent for the new tenant?,7
-8,"I want to terminate the contract, but my flatmate doesn’t. What can I do?",8
+0,How to terminate my contract?,0
+1,How can I terminate my rental contract?,0
+2,How to terminate my unlimited contract?,1
+3,How to terminate my limited rental contract?,1
+4,How can I terminate my unlimited contract?,1
+5,How can I terminate my unlimited rental contract?,1
+6,How to terminate my limited contract?,2
+7,How to terminate my limited rental contract?,2
+8,How can I terminate my limited contract?,2
+9,How can I terminate my limited rental contract?,2
+10,How to terminate my staggered rental agreement?,3
+11,How to terminate my staggered rental agreement?,
+12,How can I terminate my staggered rental agreement?,
+13,How can I terminate my staggered rental agreement?,
+14,I have found a new tenant. How can I terminate my contract?,4
+15,What are the important reasons to terminate a contract by finding a new tenant?,5
+16,I want to terminate my contract and found a new tenant. The landlord doesn’t accept the new tenant. What can I do?,6
+17,I found a new tenant to terminate my contract. Can the landloard increase the rent for the new tenant?,7
+18,"I want to terminate the contract, but my flatmate doesn’t. What can I do?",8
