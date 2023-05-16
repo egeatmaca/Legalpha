@@ -7,7 +7,8 @@ A legal chatbot giving easy to digest answers to tenancy law questions.
 For equal rights, everyone should have equal access to legal consulting.
 
 ## Solution
-A chatbot giving easy to digest answers to law questions. (With paragraph references!)
+A chatbot giving easy to digest answers to law questions. 
+(With paragraph references to prevent disinformation!)
 
 ### Scope
 The scope of this project is limited to tenancy law in Germany for now.
