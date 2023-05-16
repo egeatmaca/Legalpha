@@ -7,11 +7,12 @@ A legal chatbot giving easy to digest answers to tenancy law questions. 🤖 ⚖
 ![Image](./screenshots/1.png)
 
 ## Problem
-For equal rights, everyone should have equal access to legal consulting.
+For equal rights, everyone should have equal access to legal information / consulting.
 
 ## Solution
-A chatbot giving easy to digest answers to law questions . <br/> 
-With paragraph references to prevent disinformation!
+A chatbot giving easy to digest answers to law questions
+- Free for everyone to use
+- With paragraph references to prevent disinformation
 
 ### Scope
 The scope of this project is limited to tenancy law in Germany for now.
