@@ -42,9 +42,15 @@ def answer(request: Request):
 
         similarity = cosine_similarity(input_embedding, question.get('embedding'))[0][0]
 
+        print(f'Question: {question.get("text")}')
+        print(f'Similarity: {similarity}')
+
         if similarity > max_similarity:
             max_similarity = similarity
             most_similar_question = question
+            print(f'New max similarity: {max_similarity}')
+            print(f'New most similar question: {most_similar_question.get("text")}')
+
 
     answer = Answer.search({'id': most_similar_question['answer_id']}).next().get('text')
 
