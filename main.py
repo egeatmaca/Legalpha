@@ -36,11 +36,15 @@ def answer(request: Request):
     max_similarity = -1
     most_similar_question = None
     for question in questions:
-        if 'embedding' not in question:
-            question['embedding'] = bert.encode_sentences([question.text], combine_strategy='mean')
+        question_embedding = question.get('embedding')
+        if not question_embedding:
+            question_embedding = bert.encode_sentences([question.get('text')], combine_strategy='mean')
+            question['embedding'] = question_embedding[0].tolist()
+            question.pop('_id')
             Question(**question).update()
 
-        similarity = cosine_similarity(input_embedding, question.get('embedding'))[0][0]
+        cos_similarity = cosine_similarity(input_embedding, question_embedding)
+        similarity = cos_similarity[0][0]
 
         print(f'Question: {question.get("text")}')
         print(f'Similarity: {similarity}')
