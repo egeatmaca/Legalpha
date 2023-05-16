@@ -30,14 +30,14 @@ def index(request: Request):
 @app.get('/answer')
 def answer(request: Request):
     input_question = request.query_params['question']
-    input_embedding = bert.encode_sentences([input_question], combine_strategy='mean')[0]
+    input_embedding = bert.encode_sentences([input_question], combine_strategy='mean')
 
     questions = Question.search({'_id': {'$exists': True}})
     max_similarity = -1
     most_similar_question = None
     for question in questions:
         if 'embedding' not in question:
-            question['embedding'] = bert.encode_sentences([question.text], combine_strategy='mean')[0]
+            question['embedding'] = bert.encode_sentences([question.text], combine_strategy='mean')
             Question(**question).update()
 
         similarity = cosine_similarity(input_embedding, question.get('embedding'))[0][0]
@@ -46,7 +46,7 @@ def answer(request: Request):
             max_similarity = similarity
             most_similar_question = question
 
-    answer = Answer(id=most_similar_question.answer_id).read().text
+    answer = Answer.search({'id': most_similar_question['answer_id']}).next().get('text')
 
     return answer
 
