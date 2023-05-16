@@ -1,16 +1,11 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 import uvicorn
-from typing import Annotated
 from sklearn.metrics.pairwise import cosine_similarity
 from simpletransformers.language_representation import RepresentationModel
 from models import Question, Answer
 from inject_data import inject_data
-
-# Inject data into MongoDB
-inject_data()
 
 # Load BERT model
 bert = RepresentationModel('bert', 'bert-base-cased', use_cuda=False)
@@ -30,16 +25,18 @@ def index(request: Request):
 @app.get('/answer')
 def answer(request: Request):
     input_question = request.query_params['question']
-    input_embedding = bert.encode_sentences([input_question], combine_strategy='mean')
+    input_embedding = bert.encode_sentences([input_question], combine_strategy='mean').tolist()
+    
+    print(f'Input question: {input_question}')
 
-    questions = Question.search({'_id': {'$exists': True}})
+    questions = Question.search({'answer_id': {'$exists': True}})
     max_similarity = -1
     most_similar_question = None
     for question in questions:
         question_embedding = question.get('embedding')
         if not question_embedding:
-            question_embedding = bert.encode_sentences([question.get('text')], combine_strategy='mean')
-            question['embedding'] = question_embedding[0].tolist()
+            question_embedding = bert.encode_sentences([question.get('text')], combine_strategy='mean').tolist()
+            question['embedding'] = question_embedding
             question.pop('_id')
             Question(**question).update()
 
@@ -52,6 +49,7 @@ def answer(request: Request):
         if similarity > max_similarity:
             max_similarity = similarity
             most_similar_question = question
+            
             print(f'New max similarity: {max_similarity}')
             print(f'New most similar question: {most_similar_question.get("text")}')
 
@@ -61,4 +59,5 @@ def answer(request: Request):
     return answer
 
 if __name__ == '__main__':
+    inject_data()
     uvicorn.run(app, host='0.0.0.0', port=8000)
