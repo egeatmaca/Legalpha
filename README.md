@@ -1,10 +1,9 @@
 # Legalpha
 A legal chatbot giving easy to digest answers to tenancy law questions. 🤖 ⚖️
 
+![Image](./screenshots/1.png)
 
 *** Work in progress ***
-
-![Image](./screenshots/1.png)
 
 ## Problem
 For equal rights, everyone should have equal access to legal information / consulting.
@@ -22,16 +21,22 @@ The scope of this project is limited to tenancy law in Germany for now.
 Submit sample questions about tenancy law to train Legalpha using <a href="https://airtable.com/shrxkifiAiuAFO8Cl
 ">this form</a>.
 
-### Contribute to the content
-Do legal research and summarize the findings in a way that is easy to digest for non-lawyers. 
-
-### Contribute to the code
-You can also contribute to the code regarding the following topics:
+### Contribute to the task list
+You can also contribute to the tasks regarding the following topics:
+- Data collection
+- Legal research
 - ML / NLP
 - Frontend
 - Backend
 
-If you want to contribute to the code or content, please <a href='https://www.linkedin.com/in/ege-atmaca/'>contact me</a>.
+#### To Contribute:
+1. Pick a task from the issue list
+2. Comment on the issue that you want to work on it
+3. Fork the repository
+4. Create a pull request
+
+Please <a href='https://www.linkedin.com/in/ege-atmaca/'>contact me</a>, if you have any questions regarding the project or the contribution process. <br/>
+Also feel free to create new issues if you have any ideas or suggestions.
 
 ## How to run the code?
 ### Prerequisites
