@@ -16,6 +16,9 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./mongodb:/mongodb
+      - mongodb:/mongodb
     env_file:
       - .env
+
+volumes:
+  mongodb:
