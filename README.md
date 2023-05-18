@@ -29,9 +29,9 @@ You can also contribute to the tasks regarding the following topics:
 - Frontend
 - Backend
 
-#### To Contribute:
-1. Pick a task from the issue list
-2. Comment on the issue that you want to work on it
+To Contribute:
+1. Pick a task from the <a href='https://github.com/egeatmaca/Legalpha/issues'>issue list</a>
+2. Comment on the issue that you want to work on it 
 3. Fork the repository
 4. Create a pull request
 
