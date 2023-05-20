@@ -19,8 +19,10 @@ def inject_data():
             db.create_collection(collection)
             data = pd.read_csv(f'./data/{collection}.csv').to_dict(orient='records')
 
+            # Create records
             for record in data:
                 model(**record).create()
+
 
 if __name__ == '__main__':
     inject_data()
