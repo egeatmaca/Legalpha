@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import uvicorn
-from Legalpha import Legalpha
+from LegalphaQA import Legalpha
 from inject_data import inject_data
 
 # Initialize FastAPI
