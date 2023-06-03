@@ -1,9 +1,10 @@
+import numpy as np
 from simpletransformers.language_representation import RepresentationModel
 from sklearn.metrics.pairwise import cosine_similarity
 from models import Question, Answer
 
 class Legalpha:
-    bert = RepresentationModel('bert', 'bert-base-cased', use_cuda=False)
+    bert = RepresentationModel('bert', 'bert-base-uncased', use_cuda=False)
 
     def answer(self, input_question: str) -> str:
         '''
@@ -26,6 +27,10 @@ class Legalpha:
         most_similar_question = None
         # Iterate over each question in the database 
         for question in questions:
+            # Skip question if no answer is available
+            if np.isnan(question.get('answer_id')):
+                continue
+
             # Embed question if not already embedded
             question_embedding = question.get('embedding')
             if not question_embedding:
@@ -52,3 +57,8 @@ class Legalpha:
         answer = Answer.search({'id': most_similar_question['answer_id']}).next().get('text')
 
         return answer
+
+
+if __name__ == '__main__':
+    legalpha = Legalpha()
+    print(legalpha.answer('What is the procedure for terminating a rental contract?'))

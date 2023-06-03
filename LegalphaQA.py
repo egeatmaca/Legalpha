@@ -9,7 +9,7 @@ class Legalpha:
         if self.model_path_exists():
             self.load_model()
         else:
-            self.model = QuestionAnsweringModel('bert', 'bert-base-cased', use_cuda=False)
+            self.model = QuestionAnsweringModel('bert', 'bert-base-uncased', use_cuda=False)
 
         self.train_data = []
         self.eval_data = []
