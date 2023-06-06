@@ -1,10 +1,12 @@
 import numpy as np
 from simpletransformers.language_representation import RepresentationModel
+from simpletransformers.question_answering import QuestionAnsweringModel
 from sklearn.metrics.pairwise import cosine_similarity
 from models import Question, Answer
 
 class Legalpha:
-    bert = RepresentationModel('bert', 'bert-base-uncased', use_cuda=False)
+    representation_model = RepresentationModel('bert', 'bert-base-uncased', use_cuda=False)
+    qa_model = QuestionAnsweringModel('bert', 'bert-base-uncased', use_cuda=False)
 
     def answer(self, input_question: str) -> str:
         '''
@@ -18,7 +20,7 @@ class Legalpha:
         '''
 
         # Embed input question
-        input_embedding = Legalpha.bert.encode_sentences([input_question], combine_strategy='mean').tolist()
+        input_embedding = Legalpha.representation_model.encode_sentences([input_question], combine_strategy='mean').tolist()
 
         print(f'Input question: {input_question}')
 
@@ -34,7 +36,7 @@ class Legalpha:
             # Embed question if not already embedded
             question_embedding = question.get('embedding')
             if not question_embedding:
-                question_embedding = Legalpha.bert.encode_sentences([question.get('text')], combine_strategy='mean').tolist()
+                question_embedding = Legalpha.representation_model.encode_sentences([question.get('text')], combine_strategy='mean').tolist()
                 question['embedding'] = question_embedding
                 question.pop('_id')
                 Question(**question).update()
@@ -54,11 +56,15 @@ class Legalpha:
                 print(f'New max similarity: {max_similarity}')
                 print(f'New most similar question: {most_similar_question.get("text")}')
 
-        answer = Answer.search({'id': most_similar_question['answer_id']}).next().get('text')
+        print(f'Most similar question: {most_similar_question.get("text")}')
+        print(f'Answer ID: {most_similar_question.get("answer_id")}')
+        print(f'Type of Answer ID: {type(most_similar_question.get("answer_id"))}')
 
-        return answer
+        full_answer = Answer.search({'id': most_similar_question['answer_id']}).next().get('text')
+        specific_answer = Legalpha.qa_model.predict([{'context': full_answer, 'qas': [{'question': input_question, 'id': 0}]}])[0]
 
-
+        return specific_answer
+    
 if __name__ == '__main__':
     legalpha = Legalpha()
     print(legalpha.answer('What is the procedure for terminating a rental contract?'))
