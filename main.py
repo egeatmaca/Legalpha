@@ -24,7 +24,8 @@ def index(request: Request):
 def answer(request: Request):
     input_question = request.query_params['question']
     answer, matched_question = legalpha.answer(input_question)
-    answer = f'As far as I understood, you asked: "{matched_question}". The answer to your question is: "{answer}"'
+    answer = answer[0].lower() + answer[1:]
+    answer = f'As far as I understood, you asked: {matched_question}. According to my knowledge, {answer}'
     return answer
 
 
