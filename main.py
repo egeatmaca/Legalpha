@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 from Legalpha import Legalpha
 from inject_data import inject_data
-import json
+import numpy as np
 
 # Initialize FastAPI
 app = FastAPI()
@@ -14,6 +14,13 @@ app.mount('/static', static_files, name='static')
 
 # Initialize Legalpha
 legalpha = Legalpha()
+
+# Initialize response templates
+response_templates = [{'question_pointer': 'As far as I understood, you asked: ', 
+                       'answer_pointer': 'According to my knowledge, '},
+                       {'question_pointer': 'I think you asked: ',
+                        'answer_pointer': 'I heard from my researcher friends,'},]
+
 
 # Routes
 @app.get('/')
@@ -25,7 +32,8 @@ def answer(request: Request):
     input_question = request.query_params['question']
     answer, matched_question = legalpha.answer(input_question)
     answer = answer[0].lower() + answer[1:]
-    answer = f'As far as I understood, you asked: {matched_question} According to my knowledge, {answer}'
+    random_template = np.random.choice(response_templates)
+    answer = random_template['question_pointer'] + matched_question + random_template['answer_pointer'] +  answer
     return answer
 
 
