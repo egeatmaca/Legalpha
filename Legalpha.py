@@ -43,9 +43,6 @@ class Legalpha:
             cos_similarity = cosine_similarity(input_embedding, question_embedding)
             similarity = cos_similarity[0][0]
 
-            print(f'Question: {question.get("text")}')
-            print(f'Similarity: {similarity}')
-
             # Update the most similar question and max similarity if necessary
             if similarity > max_similarity:
                 max_similarity = similarity
@@ -55,8 +52,9 @@ class Legalpha:
                 print(f'New most similar question: {most_similar_question.get("text")}')
 
         answer = Answer.search({'id': most_similar_question['answer_id']}).next().get('text')
+        matched_question = most_similar_question.get('text')
 
-        return answer
+        return answer, matched_question
 
 
 if __name__ == '__main__':

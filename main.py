@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 from Legalpha import Legalpha
 from inject_data import inject_data
+import json
 
 # Initialize FastAPI
 app = FastAPI()
@@ -22,7 +23,8 @@ def index(request: Request):
 @app.get('/answer')
 def answer(request: Request):
     input_question = request.query_params['question']
-    answer = legalpha.answer(input_question)
+    answer, matched_question = legalpha.answer(input_question)
+    answer = f'As far as I understood, you asked: "{matched_question}". The answer to your question is: "{answer}"'
     return answer
 
 
