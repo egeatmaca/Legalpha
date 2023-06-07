@@ -25,7 +25,7 @@ def answer(request: Request):
     input_question = request.query_params['question']
     answer, matched_question = legalpha.answer(input_question)
     answer = answer[0].lower() + answer[1:]
-    answer = f'As far as I understood, you asked: {matched_question}. According to my knowledge, {answer}'
+    answer = f'As far as I understood, you asked: {matched_question} According to my knowledge, {answer}'
     return answer
 
 
