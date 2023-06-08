@@ -51,10 +51,13 @@ def answer(request: Request):
     
     answer, matched_question = legalpha.answer(question, nth_similar=nth_similar)
     
-    answer = answer[0].lower() + answer[1:]
-    random_template = np.random.choice(response_templates)
-    answer = random_template['question_pointer'] + ' ' + matched_question + ' ' + random_template['answer_pointer'] + ' ' + answer
- 
+    if answer and matched_question:
+        answer = answer[0].lower() + answer[1:]
+        random_template = np.random.choice(response_templates)
+        answer = random_template['question_pointer'] + ' ' + matched_question + ' ' + random_template['answer_pointer'] + ' ' + answer
+    else:
+        answer = 'I am sorry, I could not find an answer to your question.'
+
     print('Question: ', question)
     print('Nth Similar: ', nth_similar)
     print('Answer: ', answer)

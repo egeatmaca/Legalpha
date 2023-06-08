@@ -41,9 +41,33 @@ async function getAnswer(input) {
 }
 
 function displayAnswer(responseTextFormatted) {
+  document.querySelectorAll(".feedback-container").forEach((e) => e.remove());
+
+  const responseText = document.createElement("p");
+  responseText.innerText = responseTextFormatted;
+
+  const thumbsUpButton = document.createElement("button");
+  thumbsUpButton.setAttribute("id", "thumbs-up-button");
+  thumbsUpButton.classList.add("feedback-button");
+  thumbsUpButton.innerText = "👍";
+  thumbsUpButton.addEventListener("click", onPositiveFeedback);
+
+  const thumbsDownButton = document.createElement("button");
+  thumbsDownButton.setAttribute("id", "thumbs-down-button");
+  thumbsDownButton.classList.add("feedback-button");
+  thumbsDownButton.innerText = "👎";
+  thumbsDownButton.addEventListener("click", onNegativeFeedback);
+
+  const feedbackContainer = document.createElement("div");
+  feedbackContainer.classList.add("feedback-container");
+  feedbackContainer.appendChild(thumbsUpButton);
+  feedbackContainer.appendChild(thumbsDownButton);
+
   const responseMessage = document.createElement("div");
   responseMessage.classList.add("message");
-  responseMessage.innerHTML = responseTextFormatted;
+  responseMessage.classList.add("bot-message");
+  responseMessage.appendChild(responseText);
+  responseMessage.appendChild(feedbackContainer);
 
   const messages = document.querySelector(".messages");
   messages.appendChild(responseMessage);
@@ -76,11 +100,15 @@ async function onAsk() {
   state.retries = 0;
 }
 
-async function onRetry() {
-  displayInput('No, I was looking for something else.')
+async function onNegativeFeedback() {
   state.retries = state.retries + 1;
+  displayInput('No, I was looking for something else.')
   const answer = await getAnswer(state.last_input);
   displayAnswer(answer);
+}
+
+async function onPositiveFeedback() {
+  // TODO: Implement
 }
 
 function initialize() {
@@ -93,8 +121,6 @@ function initialize() {
         onAsk();
       }
     });
-
-  document.getElementById("retry-button").addEventListener("click", onRetry);
 }
 
 
