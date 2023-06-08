@@ -43,31 +43,34 @@ async function getAnswer(input) {
 function displayAnswer(responseTextFormatted) {
   document.querySelectorAll(".feedback-container").forEach((e) => e.remove());
 
-  const responseText = document.createElement("p");
-  responseText.innerText = responseTextFormatted;
-
-  const thumbsUpButton = document.createElement("button");
-  thumbsUpButton.setAttribute("id", "thumbs-up-button");
-  thumbsUpButton.classList.add("feedback-button");
-  thumbsUpButton.innerText = "👍";
-  thumbsUpButton.addEventListener("click", onPositiveFeedback);
-
-  const thumbsDownButton = document.createElement("button");
-  thumbsDownButton.setAttribute("id", "thumbs-down-button");
-  thumbsDownButton.classList.add("feedback-button");
-  thumbsDownButton.innerText = "👎";
-  thumbsDownButton.addEventListener("click", onNegativeFeedback);
-
-  const feedbackContainer = document.createElement("div");
-  feedbackContainer.classList.add("feedback-container");
-  feedbackContainer.appendChild(thumbsUpButton);
-  feedbackContainer.appendChild(thumbsDownButton);
-
   const responseMessage = document.createElement("div");
   responseMessage.classList.add("message");
   responseMessage.classList.add("bot-message");
+
+  const responseText = document.createElement("p");
+  responseText.innerText = responseTextFormatted;
   responseMessage.appendChild(responseText);
-  responseMessage.appendChild(feedbackContainer);
+  
+  if (!responseTextFormatted.includes("I could not find an answer")) {
+    const thumbsUpButton = document.createElement("button");
+    thumbsUpButton.setAttribute("id", "thumbs-up-button");
+    thumbsUpButton.classList.add("feedback-button");
+    thumbsUpButton.innerText = "👍";
+    thumbsUpButton.addEventListener("click", onPositiveFeedback);
+
+    const thumbsDownButton = document.createElement("button");
+    thumbsDownButton.setAttribute("id", "thumbs-down-button");
+    thumbsDownButton.classList.add("feedback-button");
+    thumbsDownButton.innerText = "👎";
+    thumbsDownButton.addEventListener("click", onNegativeFeedback);
+
+    const feedbackContainer = document.createElement("div");
+    feedbackContainer.classList.add("feedback-container");
+    feedbackContainer.appendChild(thumbsUpButton);
+    feedbackContainer.appendChild(thumbsDownButton);
+
+    responseMessage.appendChild(feedbackContainer);
+  }
 
   const messages = document.querySelector(".messages");
   messages.appendChild(responseMessage);

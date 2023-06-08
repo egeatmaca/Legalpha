@@ -57,6 +57,7 @@ class Legalpha:
             nth_similar_question = row_of_nth_similar['question']
             answer_id = row_of_nth_similar['answer_id']
             answer = Answer.search({'id': answer_id}).next().get('text')
+            print('Similarity: ', row_of_nth_similar['similarity'])
 
         return answer, nth_similar_question
 

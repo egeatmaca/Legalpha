@@ -61,6 +61,7 @@ h1 {
     position: absolute;
     right: 2.5%;
     bottom: 2.5%;
+    margin-top: 2.5%;
     display: flex;
 }
 
