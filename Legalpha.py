@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 from simpletransformers.language_representation import RepresentationModel
 from sklearn.metrics.pairwise import cosine_similarity
@@ -6,7 +7,7 @@ from models import Question, Answer
 class Legalpha:
     bert = RepresentationModel('bert', 'bert-base-uncased', use_cuda=False)
 
-    def answer(self, input_question: str) -> str:
+    def answer(self, input_question: str, nth_similar: int = 1) -> str:
         '''
         @param input_question: The question to answer
         @return: The answer to the question
@@ -20,11 +21,8 @@ class Legalpha:
         # Embed input question
         input_embedding = Legalpha.bert.encode_sentences([input_question], combine_strategy='mean').tolist()
 
-        print(f'Input question: {input_question}')
-
         questions = Question.search({'answer_id': {'$exists': True}})
-        max_similarity = -1
-        most_similar_question = None
+        questions_processed = pd.DataFrame(columns=['question', 'answer_id', 'similarity'])
         # Iterate over each question in the database 
         for question in questions:
             # Skip question if no answer is available
@@ -42,19 +40,25 @@ class Legalpha:
             # Calculate cosine similarity of question embeddings
             cos_similarity = cosine_similarity(input_embedding, question_embedding)
             similarity = cos_similarity[0][0]
+            questions_processed = pd.concat([
+                questions_processed, 
+                pd.DataFrame({'question': [question.get('text')], 
+                              'answer_id': [question.get('answer_id')], 
+                              'similarity': [similarity]})
+            ])
 
-            # Update the most similar question and max similarity if necessary
-            if similarity > max_similarity:
-                max_similarity = similarity
-                most_similar_question = question
+        # Get answer to most similar question
+        questions_processed = questions_processed.loc[questions_processed.similarity > 0.5]
+        questions_processed = questions_processed.sort_values(by='similarity', ascending=False).reset_index(drop=True)
+        nth_similar_question = None
+        answer = None
+        if questions_processed.shape[0] >= nth_similar:
+            row_of_nth_similar = questions_processed.loc[nth_similar - 1]
+            nth_similar_question = row_of_nth_similar['question']
+            answer_id = row_of_nth_similar['answer_id']
+            answer = Answer.search({'id': answer_id}).next().get('text')
 
-                print(f'New max similarity: {max_similarity}')
-                print(f'New most similar question: {most_similar_question.get("text")}')
-
-        answer = Answer.search({'id': most_similar_question['answer_id']}).next().get('text')
-        matched_question = most_similar_question.get('text')
-
-        return answer, matched_question
+        return answer, nth_similar_question
 
 
 if __name__ == '__main__':

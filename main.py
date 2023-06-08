@@ -16,10 +16,24 @@ app.mount('/static', static_files, name='static')
 legalpha = Legalpha()
 
 # Initialize response templates
-response_templates = [{'question_pointer': 'As far as I understood, you asked: ', 
-                       'answer_pointer': 'According to my knowledge, '},
-                       {'question_pointer': 'I think you asked: ',
-                        'answer_pointer': 'I heard from my researcher friends,'},]
+response_templates = [{'question_pointer': 'As far as I understood, you asked:', 
+                       'answer_pointer': 'According to my knowledge,'},
+                       {'question_pointer': 'I think you asked:',
+                        'answer_pointer': 'I heard from my researcher friends,'},
+                        {'question_pointer': 'I believe you asked:',
+                         'answer_pointer': 'You should know'},
+                        {'question_pointer': 'So your question is:',
+                            'answer_pointer': 'By reading a lot through the internet, I found out that',
+                         },]
+
+alternative_response_templates = [{'question_pointer': 'You might also be asking:',
+                                   'answer_pointer': 'I think you should know that,'},
+                                    {'question_pointer': 'Do you mean:',
+                                        'answer_pointer': 'I think that would help if you knew,'},
+                                    {'question_pointer': 'Perhaps you are asking:', 
+                                     'answer_pointer': 'My answer would be,'},
+                                    {'question_pointer': 'In a second thought, I think you were asking:',
+                                        'answer_pointer': 'In this context, '},]                              
 
 
 # Routes
@@ -29,11 +43,21 @@ def index(request: Request):
 
 @app.get('/answer')
 def answer(request: Request):
-    input_question = request.query_params['question']
-    answer, matched_question = legalpha.answer(input_question)
+    nth_similar = 1
+
+    question = request.query_params['question']
+    if 'nth_similar' in request.query_params.keys():
+        nth_similar = int(request.query_params['nth_similar'])
+    
+    answer, matched_question = legalpha.answer(question, nth_similar=nth_similar)
+    
     answer = answer[0].lower() + answer[1:]
     random_template = np.random.choice(response_templates)
-    answer = random_template['question_pointer'] + matched_question + random_template['answer_pointer'] +  answer
+    answer = random_template['question_pointer'] + ' ' + matched_question + ' ' + random_template['answer_pointer'] + ' ' + answer
+ 
+    print('Question: ', question)
+    print('Nth Similar: ', nth_similar)
+    print('Answer: ', answer)
     return answer
 
 
