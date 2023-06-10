@@ -1,7 +1,16 @@
-let state = {
+const state = {
   'last_input': '',
   'retries': 0,
 }
+
+const responses_on_positive = [
+  "I'm glad I could help! Feel free to ask if you have any other questions.",
+  "I'm glad I could be of assistance! Can I help you with anything else?",
+  "I'm glad I could be of help! Do you have any other questions?",
+  "I'm happy I could help! Let me know if you have any other questions.",
+  "I'm happy I could be of assistance! Can I help you with anything else?",
+  "I'm happy I could be of help! Do you have any other questions?",
+]; 
 
 function getInput() {
   const inputElement = document.getElementById("input-text");
@@ -51,7 +60,8 @@ function displayAnswer(responseTextFormatted) {
   responseText.innerHTML = responseTextFormatted;
   responseMessage.appendChild(responseText);
   
-  if (!responseTextFormatted.includes("I could not find an answer")) {
+  if (!(responseTextFormatted.includes("I could not find an answer") || 
+      responses_on_positive.includes(responseTextFormatted))) {
     const thumbsUpButton = document.createElement("button");
     thumbsUpButton.setAttribute("id", "thumbs-up-button");
     thumbsUpButton.classList.add("feedback-button");
@@ -115,7 +125,9 @@ async function onNegativeFeedback() {
 }
 
 async function onPositiveFeedback() {
-  // TODO: Implement
+  const random_index = Math.floor(Math.random() * responses_on_positive.length);
+  const random_response = responses_on_positive[random_index];
+  displayAnswer(random_response);
 }
 
 function initialize() {
