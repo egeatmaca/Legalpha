@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from simpletransformers.language_representation import RepresentationModel
 from sklearn.metrics.pairwise import cosine_similarity
 from models import Question, Answer
@@ -26,7 +25,7 @@ class Legalpha:
         # Iterate over each question in the database 
         for question in questions:
             # Skip question if no answer is available
-            if np.isnan(question.get('answer_id')):
+            if pd.isna(question.get('answer_id')):
                 continue
 
             # Embed question if not already embedded
@@ -47,17 +46,26 @@ class Legalpha:
                               'similarity': [similarity]})
             ])
 
-        # Get answer to most similar question
-        questions_processed = questions_processed.loc[questions_processed.similarity > 0.5]
-        questions_processed = questions_processed.sort_values(by='similarity', ascending=False).reset_index(drop=True)
-        nth_similar_question = None
-        answer = None
-        if questions_processed.shape[0] >= nth_similar:
-            row_of_nth_similar = questions_processed.loc[nth_similar - 1]
-            nth_similar_question = row_of_nth_similar['question']
-            answer_id = row_of_nth_similar['answer_id']
-            answer = Answer.search({'id': answer_id}).next().get('text')
-            print('Similarity: ', row_of_nth_similar['similarity'])
+        # Get answer to most (/nth) similar question
+        questions_processed = questions_processed.loc[questions_processed.similarity > 0.55]
+
+        if questions_processed.shape[0] == 0:
+            return None, None
+
+        questions_processed = questions_processed.sort_values(by='similarity', ascending=False)
+        questions_processed = questions_processed.drop_duplicates(subset=['answer_id'], keep='first')
+        questions_processed = questions_processed.reset_index(drop=True)
+
+        row_of_nth_similar = questions_processed.loc[nth_similar-1]
+        nth_similar_question = row_of_nth_similar['question']
+        answer_id = row_of_nth_similar['answer_id']
+        answer = Answer.search({'id': answer_id}).next().get('text')
+
+        print('Input question: ', input_question)
+        print('Row of nth similar:', row_of_nth_similar)
+        print('Nth similar question: ', nth_similar_question)
+        print('Answer: ', answer)
+        print('Similarity: ', row_of_nth_similar['similarity'])
 
         return answer, nth_similar_question
 

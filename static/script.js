@@ -48,7 +48,7 @@ function displayAnswer(responseTextFormatted) {
   responseMessage.classList.add("bot-message");
 
   const responseText = document.createElement("p");
-  responseText.innerText = responseTextFormatted;
+  responseText.innerHTML = responseTextFormatted;
   responseMessage.appendChild(responseText);
   
   if (!responseTextFormatted.includes("I could not find an answer")) {
@@ -89,6 +89,10 @@ function formatResponseText(responseText) {
 
   while (responseText.includes("\\n")) {
     responseText = responseText.replace("\\n", "<br>");
+  }
+
+  while (responseText.includes('\\"')) {
+    responseText = responseText.replace('\\"', '"');
   }
 
   return responseText;

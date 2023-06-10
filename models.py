@@ -12,7 +12,14 @@ class Model(ABC):
     __collection__ = None
 
     @abstractmethod
-    def __init__(self, id: int):
+    def __init__(self, id: int = None):
+        if not id:
+            max_id_records = type(self).search({'id': {'$exists': True}}).sort('id', -1).limit(1)
+
+            id = 0
+            for record in max_id_records:
+                id = record.get('id') + 1
+
         self.id = id
 
     def to_dict(self):
@@ -58,7 +65,7 @@ class Answer(Model):
 class Question(Model):
     __collection__ = 'questions'
     
-    def __init__(self, id: int, text: str, answer_id: str, embedding: list = None):
+    def __init__(self, text: str, id: int = None, embedding: list = None, answer_id: str = None):
         self.text = text
         self.embedding = embedding
         self.answer_id = answer_id
