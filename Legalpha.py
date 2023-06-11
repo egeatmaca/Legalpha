@@ -48,13 +48,12 @@ class Legalpha:
 
         # Get answer to most (/nth) similar question
         questions_processed = questions_processed.loc[questions_processed.similarity > 0.55]
-
-        if questions_processed.shape[0] == 0:
-            return None, None
-
         questions_processed = questions_processed.sort_values(by='similarity', ascending=False)
         questions_processed = questions_processed.drop_duplicates(subset=['answer_id'], keep='first')
         questions_processed = questions_processed.reset_index(drop=True)
+
+        if questions_processed.shape[0] < nth_similar:
+            return None, None
 
         row_of_nth_similar = questions_processed.loc[nth_similar-1]
         nth_similar_question = row_of_nth_similar['question']

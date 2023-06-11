@@ -1,10 +1,10 @@
 import pandas as pd
 from pymongo import MongoClient
 import os
-from models import Question, Answer
+from models import Question, Answer, UserQuestion
 
 # Set models to inject data for
-MODELS = [Question, Answer]
+MODELS = [Question, Answer, UserQuestion]
 
 def inject_data():
     # Connect to MongoDB
@@ -17,6 +17,10 @@ def inject_data():
         collection = model.__collection__
         if collection not in collection_names:
             db.create_collection(collection)
+
+            if not os.path.exists(f'./data/{collection}.csv'):
+                continue
+
             data = pd.read_csv(f'./data/{collection}.csv').to_dict(orient='records')
 
             # Create records

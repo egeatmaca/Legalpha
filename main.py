@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 from Legalpha import Legalpha
 from inject_data import inject_data
-from models import Question
+from models import UserQuestion, Answer
 
 # Initialize FastAPI
 app = FastAPI()
@@ -62,13 +62,44 @@ def answer(request: Request):
         answer = answer[0].lower() + answer[1:]
         answer = template['question_pointer'] + ' "' + matched_question + '" ' + template['answer_pointer'] + ' ' + answer
     else:
-        Question(text=question).create()
+        UserQuestion(text=question).create()
         answer = 'I am sorry, I could not find an answer to your question.'
 
     print('Question: ', question)
     print('Nth Similar: ', nth_similar)
     print('Answer: ', answer)
     return answer
+
+
+@app.put('/set_answer_by_feedback')
+def set_answer_by_feedback(request: Request):
+    query_question = request.query_params['question']
+    query_answer = request.query_params['answer']
+
+    all_answer_pointers = [template['answer_pointer'] for template in response_templates]
+    all_answer_pointers += [template['answer_pointer'] for template in alternative_response_templates]
+
+    for answer_pointer in all_answer_pointers:
+        query_answer_split = query_answer.split(answer_pointer)
+        if len(query_answer_split) > 1:
+            query_answer = query_answer_split[1] # Get the answer after the answer pointer
+            query_answer = query_answer[1:] # Remove the space after the answer pointer
+            query_answer = query_answer[0].upper() + query_answer[1:] # Capitalize the first letter
+            break
+
+    answer_id = Answer.search({'text': query_answer})[0]['id']
+
+    user_questions = UserQuestion.search({'text': query_question})
+
+    user_question_exists = False
+    for user_question in user_questions:
+        user_question_exists = True
+        UserQuestion(id=user_question['id'], text=user_question['text'], answer_id=answer_id).update()
+
+    if not user_question_exists:
+        UserQuestion(text=query_question, answer_id=answer_id).create()
+
+    return 'Answer set successfully!'
 
 
 if __name__ == '__main__':

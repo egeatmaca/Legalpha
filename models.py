@@ -73,3 +73,7 @@ class Question(Model):
 
     def get_answer(self):
         return Answer(id= self.answer_id)
+    
+
+class UserQuestion(Question):
+    __collection__ = 'user_questions'

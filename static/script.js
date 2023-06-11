@@ -1,5 +1,6 @@
 const state = {
   'last_input': '',
+  'last_answer': '',
   'retries': 0,
 }
 
@@ -111,9 +112,12 @@ function formatResponseText(responseText) {
 async function onAsk() {
   const input = getInput();
   displayInput(input);
+
   const answer = await getAnswer(input);
   displayAnswer(answer);
+  
   state.last_input = input;
+  state.last_answer = answer;
   state.retries = 0;
 }
 
@@ -122,12 +126,18 @@ async function onNegativeFeedback() {
   displayInput('No, I was looking for something else.')
   const answer = await getAnswer(state.last_input);
   displayAnswer(answer);
+  state.last_answer = answer;
 }
 
 async function onPositiveFeedback() {
   const random_index = Math.floor(Math.random() * responses_on_positive.length);
   const random_response = responses_on_positive[random_index];
   displayAnswer(random_response);
+
+  await fetch(
+    "/set_answer_by_feedback?question=" + state.last_input + "&answer=" + state.last_answer, 
+    {method: 'PUT'}
+  );
 }
 
 function initialize() {
