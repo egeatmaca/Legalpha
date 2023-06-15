@@ -1,6 +1,6 @@
 # Legalpha
 
-## The Chatbot for Tenancy Law Questions 🤖 ⚖️
+## Chatbot for Tenancy Law Questions 🤖 ⚖️
 
 ![Image](./screenshots/1.png)
 
