@@ -1,12 +1,13 @@
 # Legalpha
-A legal chatbot giving easy to digest answers to tenancy law questions. 🤖 ⚖️
+
+## The Chatbot for Tenancy Law Questions 🤖 ⚖️
 
 ![Image](./screenshots/1.png)
 
 *** Work in progress ***
 
 ## Problem
-For equal rights, everyone should have equal access to legal information / consulting.
+For equal rights, everyone should have equal access to legal information.
 
 ## Solution
 A chatbot giving easy to digest answers to law questions

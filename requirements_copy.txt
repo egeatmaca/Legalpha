@@ -1,9 +1,0 @@
-fastapi==0.95.1
-Jinja2==3.0.3
-pandas==2.0.1
-pymongo==4.3.3
-scikit_learn==1.2.2
-simpletransformers==0.63.11
-torch==2.0.1
-uvicorn==0.22.0
-python-multipart
