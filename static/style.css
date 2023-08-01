@@ -26,16 +26,8 @@ body {
     padding: 10px;
 }
 
-.message p {
-    width: 50%;
-}
-
 .user-message {
     text-align: right;
-}
-
-.user-message p {
-    margin-left: 50%;
 }
 
 .input {
