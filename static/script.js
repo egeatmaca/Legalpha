@@ -31,8 +31,7 @@ function displayInput(input) {
   message.classList.add("user-message");
   message.innerText = input;
   messages.appendChild(message);
-
-  window.scrollTo(0, document.body.scrollHeight);
+  messages.scroll(0, messages.scrollHeight);
 }
 
 async function getAnswer(input) {
@@ -85,8 +84,8 @@ function displayAnswer(responseTextFormatted) {
 
   const messages = document.querySelector(".messages");
   messages.appendChild(responseMessage);
-
-  window.scrollTo(0, document.body.scrollHeight);
+  
+  messages.scroll(0, messages.scrollHeight);
 }
 
 function formatResponseText(responseText) {
@@ -138,6 +137,10 @@ async function onPositiveFeedback() {
     "/set_answer_by_feedback?question=" + state.last_input + "&answer=" + state.last_answer, 
     {method: 'PUT'}
   );
+
+  state.last_input = "";
+  state.last_answer = "";
+  state.retries = 0;
 }
 
 function initialize() {
