@@ -101,6 +101,9 @@ def set_answer_by_feedback(request: Request):
 
     return 'Answer set successfully!'
 
+@app.get('/about_us')
+def about_us(request: Request):
+    return templates.TemplateResponse('about_us.html', {'request': request})
 
 if __name__ == '__main__':
     inject_data()

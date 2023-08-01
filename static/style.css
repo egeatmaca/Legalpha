@@ -26,8 +26,16 @@ body {
     padding: 10px;
 }
 
+.message p {
+    width: 50%;
+}
+
 .user-message {
     text-align: right;
+}
+
+.user-message p {
+    margin-left: 50%;
 }
 
 .input {
@@ -86,4 +94,12 @@ h1 {
     margin-right: 2%;
     color: #fff;
     text-decoration: none;
+}
+
+.about_us .messages {
+    height: 63.5vh;
+}
+
+h2 {
+    text-align: center;
 }
