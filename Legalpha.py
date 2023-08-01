@@ -6,6 +6,27 @@ from models import Question, Answer
 class Legalpha:
     bert = RepresentationModel('bert', 'bert-base-uncased', use_cuda=False)
 
+    def calculate_sentence_embedding(self, sentence: str) -> list:
+        '''
+        @param sentence: The sentence to embed
+        @return: The embedding of the sentence
+
+        This function takes in a sentence and returns the embedding of the sentence.
+        '''
+
+        return Legalpha.bert.encode_sentences([sentence], combine_strategy='mean').tolist()
+    
+    def calculate_cosine_similarity(self, embedding1: str, embedding2: str) -> float:
+        '''
+        @param embedding1: The first embedding
+        @param embedding2: The second embedding
+        @return: The cosine similarity of the two embeddings
+
+        This function takes in two embeddings and returns the cosine similarity of the two embeddings.
+        '''
+
+        return cosine_similarity(embedding1, embedding2)[0][0]
+
     def answer(self, input_question: str, nth_similar: int = 1) -> str:
         '''
         @param input_question: The question to answer
@@ -18,7 +39,7 @@ class Legalpha:
         '''
 
         # Embed input question
-        input_embedding = Legalpha.bert.encode_sentences([input_question], combine_strategy='mean').tolist()
+        input_embedding = self.calculate_sentence_embedding(input_question)
 
         questions = Question.search({'answer_id': {'$exists': True}})
         questions_processed = pd.DataFrame(columns=['question', 'answer_id', 'similarity'])
@@ -31,14 +52,13 @@ class Legalpha:
             # Embed question if not already embedded
             question_embedding = question.get('embedding')
             if not question_embedding:
-                question_embedding = Legalpha.bert.encode_sentences([question.get('text')], combine_strategy='mean').tolist()
+                question_embedding = self.calculate_sentence_embedding(question.get('text'))
                 question['embedding'] = question_embedding
                 question.pop('_id')
                 Question(**question).update()
 
             # Calculate cosine similarity of question embeddings
-            cos_similarity = cosine_similarity(input_embedding, question_embedding)
-            similarity = cos_similarity[0][0]
+            similarity = self.calculate_cosine_similarity(input_embedding, question_embedding)
             questions_processed = pd.concat([
                 questions_processed, 
                 pd.DataFrame({'question': [question.get('text')], 

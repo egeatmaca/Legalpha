@@ -28,7 +28,7 @@ class Model(ABC):
     def create(self):
         if not self.__collection__:
             raise NotImplementedError('Cannot save model without collection name')
-        print(db[self.__collection__].insert_one(self.to_dict()))
+        db[self.__collection__].insert_one(self.to_dict())
 
     def read(self):
         if not self.__collection__:

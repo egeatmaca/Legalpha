@@ -2,9 +2,13 @@ import pandas as pd
 from pymongo import MongoClient
 import os
 from models import Question, Answer, UserQuestion
+from Legalpha import Legalpha
 
 # Set models to inject data for
 MODELS = [Question, Answer, UserQuestion]
+
+# Initialize Legalpha
+legalpha = Legalpha()
 
 def inject_data():
     # Connect to MongoDB
@@ -25,6 +29,8 @@ def inject_data():
 
             # Create records
             for record in data:
+                if collection == Question.__collection__:
+                    record['embedding'] = legalpha.calculate_sentence_embedding(record['text'])
                 model(**record).create()
 
 

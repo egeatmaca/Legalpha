@@ -1,7 +1,7 @@
 services:
   legalpha:
     build: .
-    image: legalpha
+    # image: legalpha
     ports:
       - "8000:8000"
     volumes:
