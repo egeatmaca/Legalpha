@@ -15,7 +15,7 @@ body {
 }
 
 .messages {
-    height: 67vh;
+    height: 60vh;
     overflow: auto;
     padding: 10px;
 }
@@ -89,7 +89,7 @@ h1 {
 }
 
 .about_us .messages {
-    height: 63.5vh;
+    height: 65vh;
 }
 
 h2 {
