@@ -132,3 +132,6 @@ dmypy.json
 db.sqlite3
 postgres_data/
 mongodb/
+
+# MacOS
+.DS_Store
