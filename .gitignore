@@ -133,5 +133,5 @@ db.sqlite3
 postgres_data/
 mongodb/
 
-# MacOS
+# Mac OS
 .DS_Store
