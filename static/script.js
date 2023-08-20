@@ -125,6 +125,12 @@ async function onNegativeFeedback() {
   displayInput('No, I was looking for something else.')
   const answer = await getAnswer(state.last_input);
   displayAnswer(answer);
+
+  await fetch(
+    "/handle_feedback?question=" + state.last_input + "&answer=" + state.last_answer + "&feedback=false",
+    {method: 'PUT'}
+  );
+
   state.last_answer = answer;
 }
 
@@ -134,7 +140,7 @@ async function onPositiveFeedback() {
   displayAnswer(random_response);
 
   await fetch(
-    "/set_answer_by_feedback?question=" + state.last_input + "&answer=" + state.last_answer, 
+    "/handle_feedback?question=" + state.last_input + "&answer=" + state.last_answer + "&feedback=true",
     {method: 'PUT'}
   );
 

@@ -3,9 +3,10 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import uvicorn
+
 from Legalpha import Legalpha
-from inject_data import inject_data
-from models import UserQuestion, Answer
+from jobs.inject_data import inject_data
+import utils.feedback
 
 # Initialize FastAPI
 app = FastAPI()
@@ -34,8 +35,10 @@ alternative_response_templates = [{'question_pointer': 'If that was not your que
                                     {'question_pointer': 'Sorry to hear that, I can try again. Perhaps you were asking:', 
                                      'answer_pointer': 'My answer would be,'},
                                     {'question_pointer': 'In a second thought, I think you were asking:',
-                                        'answer_pointer': 'In this context, '},]                              
+                                        'answer_pointer': 'In this context, '},]       
 
+all_templates = response_templates + alternative_response_templates
+all_answer_pointers = [template['answer_pointer'] for template in all_templates]
 
 # Routes
 @app.get('/')
@@ -62,44 +65,30 @@ def answer(request: Request):
         answer = answer[0].lower() + answer[1:]
         answer = template['question_pointer'] + ' "' + matched_question + '" ' + template['answer_pointer'] + ' ' + answer
     else:
-        UserQuestion(text=question).create()
         answer = 'I am sorry, I could not find an answer to your question.'
 
+    if nth_similar == 1:
+        utils.feedback.create_user_question(question)
+    
     print('Question: ', question)
     print('Nth Similar: ', nth_similar)
     print('Answer: ', answer)
     return answer
 
+@app.put('/handle_feedback')
+def handle_feedback(request: Request):
+    question = request.query_params['question']
+    answer = request.query_params['answer']
+    feedback = request.query_params['feedback']
 
-@app.put('/set_answer_by_feedback')
-def set_answer_by_feedback(request: Request):
-    query_question = request.query_params['question']
-    query_answer = request.query_params['answer']
+    answer_id = utils.feedback.get_id_from_query_answer(answer, all_answer_pointers)
+    user_question_updated = utils.feedback.handle_feedback(question, answer_id, feedback)
 
-    all_answer_pointers = [template['answer_pointer'] for template in response_templates]
-    all_answer_pointers += [template['answer_pointer'] for template in alternative_response_templates]
-
-    for answer_pointer in all_answer_pointers:
-        query_answer_split = query_answer.split(answer_pointer)
-        if len(query_answer_split) > 1:
-            query_answer = query_answer_split[1] # Get the answer after the answer pointer
-            query_answer = query_answer[1:] # Remove the space after the answer pointer
-            query_answer = query_answer[0].upper() + query_answer[1:] # Capitalize the first letter
-            break
-
-    answer_id = Answer.search({'text': query_answer})[0]['id']
-
-    user_questions = UserQuestion.search({'text': query_question})
-
-    user_question_exists = False
-    for user_question in user_questions:
-        user_question_exists = True
-        UserQuestion(id=user_question['id'], text=user_question['text'], answer_id=answer_id).update()
-
-    if not user_question_exists:
-        UserQuestion(text=query_question, answer_id=answer_id).create()
-
-    return 'Answer set successfully!'
+    if not user_question_updated:
+        return 'No question found to update.'
+    
+    return 'Feedback received.'
+    
 
 @app.get('/about_us')
 def about_us(request: Request):
