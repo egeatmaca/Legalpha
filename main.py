@@ -48,6 +48,8 @@ def index(request: Request):
 @app.get('/answer')
 def answer(request: Request):
     question = request.query_params['question']
+    user_question_id = request.query_params.get('user_question_id', None)
+    user_question_id = int(user_question_id) if isinstance(user_question_id, str) else user_question_id
 
     nth_similar = 1
     if 'nth_similar' in request.query_params.keys():
@@ -59,7 +61,7 @@ def answer(request: Request):
     else:
         template = np.random.choice(alternative_response_templates)
 
-    answer, matched_question = legalpha.answer(question, nth_similar=nth_similar)
+    answer, answer_id, matched_question = legalpha.answer(question, nth_similar=nth_similar)
 
     if answer and matched_question:
         answer = answer[0].lower() + answer[1:]
@@ -67,22 +69,27 @@ def answer(request: Request):
     else:
         answer = 'I am sorry, I could not find an answer to your question.'
 
-    if nth_similar == 1:
-        utils.feedback.create_user_question(question)
-    
-    print('Question: ', question)
-    print('Nth Similar: ', nth_similar)
-    print('Answer: ', answer)
-    return answer
+    if user_question_id is None:
+        user_question = utils.feedback.create_user_question(question)
+        user_question_id = user_question.id
+        
+    utils.feedback.set_last_answer(user_question_id, answer_id)
+
+    return {'answer': answer, 'answer_id': answer_id, 'user_question_id': user_question_id}
 
 @app.put('/handle_feedback')
 def handle_feedback(request: Request):
-    question = request.query_params['question']
-    answer = request.query_params['answer']
+    user_question_id = request.query_params['user_question_id']
+    user_question_id = int(user_question_id) if isinstance(user_question_id, str) else user_question_id
+    answer_id = request.query_params['answer_id']
+    answer_id = int(answer_id) if isinstance(answer_id, str) else answer_id
     feedback = request.query_params['feedback']
 
-    answer_id = utils.feedback.get_id_from_query_answer(answer, all_answer_pointers)
-    user_question_updated = utils.feedback.handle_feedback(question, answer_id, feedback)
+    user_question_updated = utils.feedback.handle_feedback(
+        user_question_id=user_question_id,
+        answer_id=answer_id,
+        feedback=feedback
+    )
 
     if not user_question_updated:
         return 'No question found to update.'

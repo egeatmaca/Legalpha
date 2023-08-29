@@ -13,7 +13,7 @@ class Model(ABC):
 
     @abstractmethod
     def __init__(self, id: int = None):
-        if not id:
+        if id is None:
             max_id_records = type(self).search({'id': {'$exists': True}}).sort('id', -1).limit(1)
 
             id = 0
@@ -78,14 +78,16 @@ class Question(Model):
 class UserQuestion(Model):
     __collection__ = 'user_questions'
 
-    def __init__(self, text: str, id: int = None, 
-                 first_answer_id: str = None, first_feedback: bool = None, 
-                 last_answer_id: str = None, last_feedback: bool = None, 
+    def __init__(self, id: int = None, 
+                 text: str=None, last_answer: int = None,
+                 first_answer_received_feedback: int = None, first_feedback: bool = None, 
+                 last_answer_received_feedback: int = None, last_feedback: bool = None, 
                  n_answers: int = 0):
         self.text = text
-        self.first_answer_id = first_answer_id
+        self.last_answer = last_answer
+        self.first_answer_received_feedback = first_answer_received_feedback
         self.first_feedback = first_feedback
-        self.last_answer_id = last_answer_id
+        self.last_answer_received_feedback = last_answer_received_feedback
         self.last_feedback = last_feedback
         self.n_answers = n_answers
         super().__init__(id)

@@ -19,25 +19,37 @@ def get_id_from_query_answer(query_answer: str, all_answer_pointers: list):
 def create_user_question(query_question):
     user_question = UserQuestion(text=query_question)
     user_question.create()
-    user_question.read()
     return user_question
     
-def handle_feedback(query_question, answer_id, feedback):
-    user_questions = UserQuestion.search({'text': query_question})
+def set_last_answer(user_question_id, answer_id):
+    user_questions = UserQuestion.search({'id': user_question_id})
     updated = False
 
     for user_question in user_questions:
-        print('User Question 1: ')
-        print(user_question)
         user_question.pop('_id')
-        print('User Question 2: ')
-        print(user_question)
         user_question = UserQuestion(**user_question)
-        user_question.first_answer_id = user_question.first_answer_id if user_question.first_answer_id is not None else answer_id
-        user_question.first_feedback = user_question.first_feedback if user_question.first_feedback is not None else feedback
-        user_question.last_answer_id = answer_id
-        user_question.last_feedback = feedback
+        user_question.last_answer = answer_id
         user_question.n_answers = user_question.n_answers + 1
+        user_question.update()
+        updated = True
+
+    return updated
+
+def handle_feedback(user_question_id, answer_id, feedback):
+    user_questions = UserQuestion.search({'id': user_question_id})
+    updated = False
+
+    for user_question in user_questions:
+        user_question.pop('_id')
+        user_question = UserQuestion(**user_question)
+
+        if not user_question.first_answer_received_feedback and not user_question.first_feedback:
+            user_question.first_answer_received_feedback = answer_id
+            user_question.first_feedback = feedback
+        
+        user_question.last_answer_received_feedback = answer_id
+        user_question.last_feedback = feedback
+        
         user_question.update()
         updated = True
 

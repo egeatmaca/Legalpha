@@ -86,7 +86,7 @@ class Legalpha:
         print('Answer: ', answer)
         print('Similarity: ', row_of_nth_similar['similarity'])
 
-        return answer, nth_similar_question
+        return answer, answer_id, nth_similar_question
 
 
 if __name__ == '__main__':

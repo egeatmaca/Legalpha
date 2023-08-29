@@ -1,6 +1,8 @@
 const state = {
-  'last_input': '',
+  'question': '',
+  'last_user_question_id': -1,
   'last_answer': '',
+  'last_answer_id': -1,
   'retries': 0,
 }
 
@@ -40,16 +42,19 @@ async function getAnswer(input) {
   }
 
   let question = encodeURIComponent(input);
-  const response = await fetch(
-    "/answer?question=" + question + "&nth_similar=" + (state.retries + 1)
-  );
-  const responseText = await response.text();
-  const responseTextFormatted = formatResponseText(responseText);
+  let url = "/answer?question=" + question + "&nth_similar=" + (state.retries + 1)
+  if (state.last_user_question_id != -1) {
+    url += "&user_question_id=" + state.last_user_question_id;
+  }
+  const response = await fetch(url);
+  const responseJson = JSON.parse(await response.text());
 
-  return responseTextFormatted;
+  return responseJson
 }
 
-function displayAnswer(responseTextFormatted) {
+function displayAnswer(answer) {
+  const answerFormatted = formatAnswer(answer);
+
   document.querySelectorAll(".feedback-container").forEach((e) => e.remove());
 
   const responseMessage = document.createElement("div");
@@ -57,11 +62,11 @@ function displayAnswer(responseTextFormatted) {
   responseMessage.classList.add("bot-message");
 
   const responseText = document.createElement("p");
-  responseText.innerHTML = responseTextFormatted;
+  responseText.innerHTML = answerFormatted;
   responseMessage.appendChild(responseText);
   
-  if (!(responseTextFormatted.includes("I could not find an answer") || 
-      responses_on_positive.includes(responseTextFormatted))) {
+  if (!(answerFormatted.includes("I could not find an answer") || 
+      responses_on_positive.includes(answerFormatted))) {
     const thumbsUpButton = document.createElement("button");
     thumbsUpButton.setAttribute("id", "thumbs-up-button");
     thumbsUpButton.classList.add("feedback-button");
@@ -88,50 +93,56 @@ function displayAnswer(responseTextFormatted) {
   messages.scroll(0, messages.scrollHeight);
 }
 
-function formatResponseText(responseText) {
-  if (responseText.startsWith('"')) {
-    responseText = responseText.substring(1, responseText.length);
+function formatAnswer(answer) {
+  if (answer.startsWith('"')) {
+    answer = answer.substring(1, answer.length);
   }
 
-  if (responseText.endsWith('"')) {
-    responseText = responseText.substring(0, responseText.length - 1);
+  if (answer.endsWith('"')) {
+    answer = answer.substring(0, answer.length - 1);
   }
 
-  while (responseText.includes("\\n")) {
-    responseText = responseText.replace("\\n", "<br>");
+  while (answer.includes("\\n")) {
+    answer = answer.replace("\\n", "<br>");
   }
 
-  while (responseText.includes('\\"')) {
-    responseText = responseText.replace('\\"', '"');
+  while (answer.includes('\\"')) {
+    answer = answer.replace('\\"', '"');
   }
 
-  return responseText;
+  return answer;
 }
 
 async function onAsk() {
   const input = getInput();
   displayInput(input);
 
-  const answer = await getAnswer(input);
-  displayAnswer(answer);
+  const answerJson = await getAnswer(input);
+  console.log(answerJson);
+  displayAnswer(answerJson.answer);
   
-  state.last_input = input;
-  state.last_answer = answer;
+  state.last_question = input;
+  state.last_user_question_id = answerJson.user_question_id;
+  state.last_answer = answerJson.answer;
+  state.last_answer_id = answerJson.answer_id;
   state.retries = 0;
 }
 
 async function onNegativeFeedback() {
-  state.retries = state.retries + 1;
   displayInput('No, I was looking for something else.')
-  const answer = await getAnswer(state.last_input);
-  displayAnswer(answer);
+
+  state.retries = state.retries + 1;
+
+  const answerJson = await getAnswer(state.last_question);
+  displayAnswer(answerJson.answer);
 
   await fetch(
-    "/handle_feedback?question=" + state.last_input + "&answer=" + state.last_answer + "&feedback=false",
+    "/handle_feedback?user_question_id=" + state.last_user_question_id + "&answer_id=" + state.last_answer_id + "&feedback=false",
     {method: 'PUT'}
   );
 
-  state.last_answer = answer;
+  state.last_answer = answerJson.answer;
+  state.last_answer_id = answerJson.answer_id;
 }
 
 async function onPositiveFeedback() {
@@ -140,12 +151,14 @@ async function onPositiveFeedback() {
   displayAnswer(random_response);
 
   await fetch(
-    "/handle_feedback?question=" + state.last_input + "&answer=" + state.last_answer + "&feedback=true",
+    "/handle_feedback?user_question_id=" + state.last_user_question_id + "&answer_id=" + state.last_answer_id + "&feedback=true",
     {method: 'PUT'}
   );
 
-  state.last_input = "";
+  state.last_question = "";
+  state.last_user_question_id = -1;
   state.last_answer = "";
+  state.last_answer_id = -1;
   state.retries = 0;
 }
 
