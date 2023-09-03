@@ -1,5 +1,5 @@
 const state = {
-  'question': '',
+  'last_question': '',
   'last_user_question_id': -1,
   'last_answer': '',
   'last_answer_id': -1,
@@ -117,15 +117,17 @@ async function onAsk() {
   const input = getInput();
   displayInput(input);
 
+  state.last_question = input;
+  state.last_user_question_id = -1;
+  state.retries = 0;
+
   const answerJson = await getAnswer(input);
   console.log(answerJson);
   displayAnswer(answerJson.answer);
-  
-  state.last_question = input;
+
   state.last_user_question_id = answerJson.user_question_id;
   state.last_answer = answerJson.answer;
   state.last_answer_id = answerJson.answer_id;
-  state.retries = 0;
 }
 
 async function onNegativeFeedback() {

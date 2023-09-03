@@ -16,6 +16,26 @@ class Legalpha:
 
         return Legalpha.bert.encode_sentences([sentence], combine_strategy='mean').tolist()
     
+    def calculate_sentence_embedding_db(self, question: pd.Series) -> list:
+        '''
+        @param sentence: The sentence to embed
+        @return: The embedding of the sentence
+
+        This function takes in a sentence and returns the embedding of the sentence.
+        '''
+
+        question = question.to_dict()
+        embedding = question.get('embedding')
+
+        if embedding:
+            return embedding
+        else:
+            sentence = question.get('text')
+            embedding = Legalpha.bert.encode_sentences(sentence, combine_strategy='mean').tolist()
+            question['embedding'] = embedding
+            Question(**question).update()
+            return embedding
+    
     def calculate_cosine_similarity(self, embedding1: str, embedding2: str) -> float:
         '''
         @param embedding1: The first embedding
@@ -26,69 +46,65 @@ class Legalpha:
         '''
 
         return cosine_similarity(embedding1, embedding2)[0][0]
+    
+    def fit(self, questions: pd.DataFrame=None, answers: pd.DataFrame=None):
+        if questions and answers:
+            # Check if questions have required columns
+            question_columns = pd.Series(['text', 'answer_id'])
+            if not question_columns.isin(questions.columns).all():
+                raise ValueError('Questions should have columns: text, answer_id')
+            
+            # Check if answers have required columns
+            answer_columns = pd.Series(['id', 'text'])
+            if not answer_columns.isin(answers.columns).all():
+                raise ValueError('Answers should have columns: id, text')
+            
+            # Embed questions
+            questions['embedding'] = questions['text'].apply(self.calculate_sentence_embedding)
+        elif not questions and not answers:
+            # Get questions and answers from database
+            questions = pd.DataFrame(Question.search({})).drop(columns=['_id'])
+            answers = pd.DataFrame(Answer.search({})).drop(columns=['_id'])
+            
+            # Embed questions if not already embedded
+            questions['embedding'] = questions.apply(self.calculate_sentence_embedding_db, axis=1)
+        else:
+            raise ValueError('Either both questions and answers should be provided or none of them')
+        
+        # Set questions and answers as attributes
+        self.questions = questions[['text', 'embedding', 'answer_id']]
+        self.answers = answers[['id', 'text']]
 
-    def answer(self, input_question: str, nth_similar: int = 1) -> str:
+    def predict(self, input_question: str, nth_similar: int = 1) -> str:
         '''
         @param input_question: The question to answer
+        @param nth_similar: The nth most similar question to return the answer to
         @return: The answer to the question
-
-        This function takes in a question and returns the answer to the question.
-        1. The question is embedded using BERT.
-        2. The most similar question in database is found by comparing embeddings with cosine similarity.
-        3. The answer to the most similar question is returned.
         '''
-
         # Embed input question
         input_embedding = self.calculate_sentence_embedding(input_question)
 
-        questions = Question.search({'answer_id': {'$exists': True}})
-        questions_processed = pd.DataFrame(columns=['question', 'answer_id', 'similarity'])
-        # Iterate over each question in the database 
-        for question in questions:
-            # Skip question if no answer is available
-            if pd.isna(question.get('answer_id')):
-                continue
+        # Calculate cosine similarity of question embeddings
+        questions = self.questions.copy()
+        questions['similarities'] = questions['embedding'].apply(lambda x: self.calculate_cosine_similarity(input_embedding, x))
+        
+        # Find the most (/nth) similar question
+        questions = questions.loc[questions['similarities'] > 0.55] 
+        questions = questions.sort_values(by='similarities', ascending=False)
+        questions = questions.drop_duplicates(subset=['answer_id'], keep='first') 
+        questions = questions.reset_index(drop=True)
+        if nth_similar > questions.shape[0]:
+            return None, None, None
+        nth_similar_question = questions.iloc[nth_similar-1]
+        
+        # Get answer to the most (/nth) similar question
+        answer_id = nth_similar_question['answer_id']
+        answer = self.answers.loc[self.answers['id'] == answer_id]['text'].values[0]
+        nth_similar_question_text = nth_similar_question['text']
 
-            # Embed question if not already embedded
-            question_embedding = question.get('embedding')
-            if not question_embedding:
-                question_embedding = self.calculate_sentence_embedding(question.get('text'))
-                question['embedding'] = question_embedding
-                question.pop('_id')
-                Question(**question).update()
-
-            # Calculate cosine similarity of question embeddings
-            similarity = self.calculate_cosine_similarity(input_embedding, question_embedding)
-            questions_processed = pd.concat([
-                questions_processed, 
-                pd.DataFrame({'question': [question.get('text')], 
-                              'answer_id': [question.get('answer_id')], 
-                              'similarity': [similarity]})
-            ])
-
-        # Get answer to most (/nth) similar question
-        questions_processed = questions_processed.loc[questions_processed.similarity > 0.55]
-        questions_processed = questions_processed.sort_values(by='similarity', ascending=False)
-        questions_processed = questions_processed.drop_duplicates(subset=['answer_id'], keep='first')
-        questions_processed = questions_processed.reset_index(drop=True)
-
-        if questions_processed.shape[0] < nth_similar:
-            return None, None
-
-        row_of_nth_similar = questions_processed.loc[nth_similar-1]
-        nth_similar_question = row_of_nth_similar['question']
-        answer_id = row_of_nth_similar['answer_id']
-        answer = Answer.search({'id': answer_id}).next().get('text')
-
-        print('Input question: ', input_question)
-        print('Row of nth similar:', row_of_nth_similar)
-        print('Nth similar question: ', nth_similar_question)
-        print('Answer: ', answer)
-        print('Similarity: ', row_of_nth_similar['similarity'])
-
-        return answer, answer_id, nth_similar_question
+        return answer, answer_id, nth_similar_question_text
 
 
 if __name__ == '__main__':
     legalpha = Legalpha()
-    print(legalpha.answer('What is the procedure for terminating a rental contract?'))
+    print(legalpha.predict('What is the procedure for terminating a rental contract?'))

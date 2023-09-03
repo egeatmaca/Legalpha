@@ -61,7 +61,7 @@ def answer(request: Request):
     else:
         template = np.random.choice(alternative_response_templates)
 
-    answer, answer_id, matched_question = legalpha.answer(question, nth_similar=nth_similar)
+    answer, answer_id, matched_question = legalpha.predict(question, nth_similar=nth_similar)
 
     if answer and matched_question:
         answer = answer[0].lower() + answer[1:]
@@ -103,4 +103,5 @@ def about_us(request: Request):
 
 if __name__ == '__main__':
     inject_data()
+    legalpha.fit()
     uvicorn.run(app, host='0.0.0.0', port=8000)
