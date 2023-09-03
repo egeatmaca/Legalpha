@@ -9,7 +9,6 @@ services:
       - .env
     depends_on:
       - db
-    command: python main.py --test --test_size 0.1
 
   db:
     image: mongo
