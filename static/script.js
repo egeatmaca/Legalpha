@@ -139,7 +139,7 @@ async function onNegativeFeedback() {
   displayAnswer(answerJson.answer);
 
   await fetch(
-    "/handle_feedback?user_question_id=" + state.last_user_question_id + "&answer_id=" + state.last_answer_id + "&feedback=false",
+    "/handle_feedback?user_question_id=" + state.last_user_question_id + "&answer_id=" + state.last_answer_id + "&feedback=0",
     {method: 'PUT'}
   );
 
@@ -153,7 +153,7 @@ async function onPositiveFeedback() {
   displayAnswer(random_response);
 
   await fetch(
-    "/handle_feedback?user_question_id=" + state.last_user_question_id + "&answer_id=" + state.last_answer_id + "&feedback=true",
+    "/handle_feedback?user_question_id=" + state.last_user_question_id + "&answer_id=" + state.last_answer_id + "&feedback=1",
     {method: 'PUT'}
   );
 

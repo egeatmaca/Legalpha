@@ -1,7 +1,6 @@
 services:
   legalpha:
     build: .
-    # image: legalpha
     ports:
       - "8000:8000"
     volumes:
@@ -10,6 +9,7 @@ services:
       - .env
     depends_on:
       - db
+    command: python main.py --test --test_size 0.1
 
   db:
     image: mongo

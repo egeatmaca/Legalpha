@@ -48,7 +48,11 @@ class Legalpha:
         return cosine_similarity(embedding1, embedding2)[0][0]
     
     def fit(self, questions: pd.DataFrame=None, answers: pd.DataFrame=None):
-        if questions and answers:
+        if questions is not None and answers is not None:
+            # Check if questions and answers of correct type
+            if not isinstance(questions, pd.DataFrame) or not isinstance(answers, pd.DataFrame):
+                raise TypeError('Questions and answers should be of type pandas.DataFrame')
+
             # Check if questions have required columns
             question_columns = pd.Series(['text', 'answer_id'])
             if not question_columns.isin(questions.columns).all():
