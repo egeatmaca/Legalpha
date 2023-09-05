@@ -104,9 +104,9 @@ def handle_feedback(request: Request):
     return 'Feedback received.'
     
 
-@app.get('/about_us')
-def about_us(request: Request):
-    return templates.TemplateResponse('about_us.html', {'request': request})
+@app.get('/about')
+def about(request: Request):
+    return templates.TemplateResponse('about.html', {'request': request})
 
 def run_app():
     inject_data()
