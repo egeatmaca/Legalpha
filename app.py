@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, Request, Response
@@ -5,9 +6,10 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-from legalpha.LegalphaBertClf import LegalphaBertClf as Legalpha
+from legalpha.Legalpha import Legalpha
 from models import Answer
 from jobs.inject_data import inject_data
+from jobs.train_legalpha import train_legalpha
 import utils.feedback
 
 # Initialize FastAPI
@@ -116,9 +118,19 @@ def about(request: Request):
     return templates.TemplateResponse('about.html', {'request': request})
 
 def run_app():
+    # Inject data
     inject_data()
-    questions = pd.read_csv('data/questions.csv')
-    legalpha.fit(questions['text'], questions['answer_id'])
+
+    # Train Legalpha, if no saved model exists
+    legalpha_pretrained_path = os.environ.get('LEGALPHA_PRETRAINED_PATH')
+    legalpha_questions_path = os.environ.get('LEGALPHA_QUESTIONS_PATH')
+    if not os.path.exists(legalpha_pretrained_path) and os.path.exists(legalpha_questions_path):
+        train_legalpha(legalpha_pretrained_path)
+
+    # Load Legalpha
+    legalpha.load(legalpha_pretrained_path)
+    
+    # Run the app
     uvicorn.run(app, host='0.0.0.0', port=8000)
 
 if __name__ == '__main__':

@@ -1,12 +1,15 @@
 import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Embedding, LSTM, Bidirectional, AveragePooling1D, Flatten
+from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.layers import Dense
 from simpletransformers.language_representation import RepresentationModel
 from sklearn.preprocessing import OneHotEncoder
+import pickle
+import os
 
-
-class LegalphaBertClf:
+class Legalpha:
     bert = RepresentationModel('bert', 'bert-base-uncased', use_cuda=False)
+    model_folder = 'model'
+    one_hot_encoder_file = 'one_hot_encoder.pkl'
 
     def __init__(self):
         self.one_hot_encoder = OneHotEncoder()
@@ -51,5 +54,20 @@ class LegalphaBertClf:
         X = self.bert.encode_sentences(X, combine_strategy='mean')
         y = self.one_hot_encoder.transform(y.values.reshape(-1, 1)).toarray()
         return self.model.evaluate(X, y)
+    
+    def save(self, path):
+        model_path = os.path.join(path, self.model_folder)
+        one_hot_encoder_path = os.path.join(path, self.one_hot_encoder_file)
+
+        os.makedirs(path, exist_ok=True)
+        pickle.dump(self.one_hot_encoder, open(one_hot_encoder_path, 'wb'))
+        self.model.save(model_path)
+
+    def load(self, path):
+        model_path = os.path.join(path, self.model_folder)
+        one_hot_encoder_path = os.path.join(path, self.one_hot_encoder_file)
+
+        self.one_hot_encoder = pickle.load(open(one_hot_encoder_path, 'rb'))
+        self.model = load_model(model_path)
 
 
