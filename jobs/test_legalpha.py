@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.metrics import classification_report
 from Legalpha import Legalpha
+from experiments import LegalphaClf, LegalphaBertClf
 from time import time
 
 def get_test_data(test_size=0.2, random_state=42):
@@ -36,7 +37,7 @@ def predict_all(questions_pred, legalpha):
 def evaluate(answers_true, answers_predicted):
     return classification_report(answers_true, answers_predicted)
 
-def test_legalpha(test_size=0.2, random_state=42):
+def test_legalpha(test_size=0.2, random_state=42, model='semantic_search'):
     print(f'Test Size: {test_size}')
     print(f'Random State: {random_state}')
 
@@ -59,6 +60,40 @@ def test_legalpha(test_size=0.2, random_state=42):
     answers_pred = predict_all(questions_test, legalpha)
     test_end = time()
     test_results = evaluate(answers_test, answers_pred)
+    print(f'Test Time: {test_end - test_start} seconds')
+    print(f'Test Results: \n{test_results}')
+
+
+def test_legalpha_clf(test_size=0.2, random_state=42, bert_embeddings=False):
+    print(f'Test Size: {test_size}')
+    print(f'Random State: {random_state}')
+
+    questions_train, questions_test, answers = get_test_data(test_size, random_state)
+
+    print(f'#Training Questions: {questions_train.shape[0]}')
+    print(f'#Test Questions: {questions_test.shape[0]}')
+    print(f'#Answers: {answers.shape[0]}')
+
+    X_train = questions_train['text']
+    y_train = questions_train['answer_id']
+
+    X_test = questions_test['text']
+    y_test = questions_test['answer_id']
+
+    legalpha_clf = LegalphaBertClf() if bert_embeddings else LegalphaClf()
+    model_name = 'LegalphaBertClf' if bert_embeddings else 'LegalphaClf'
+
+    print(f'Training {model_name}...')
+    training_start = time()
+    legalpha_clf.fit(X_train, y_train, validation_split=None)
+    training_end = time()
+    print(f'Training Time: {training_end - training_start} seconds')
+
+    print(f'Testing {model_name}...')
+    test_start = time()
+    y_pred = legalpha_clf.predict(X_test)
+    test_end = time()
+    test_results = evaluate(y_test, y_pred)
     print(f'Test Time: {test_end - test_start} seconds')
     print(f'Test Results: \n{test_results}')
 
