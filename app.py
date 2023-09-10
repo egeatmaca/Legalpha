@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-from Legalpha import Legalpha
+from legalpha.LegalphaSemSearch import LegalphaSemSearch as Legalpha
 from jobs.inject_data import inject_data
 import utils.feedback
 

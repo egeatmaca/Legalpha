@@ -3,7 +3,7 @@ from simpletransformers.language_representation import RepresentationModel
 from sklearn.metrics.pairwise import cosine_similarity
 from models import Question, Answer
 
-class Legalpha:
+class LegalphaSemSearch:
     bert = RepresentationModel('bert', 'bert-base-uncased', use_cuda=False)
 
     def calculate_sentence_embedding(self, sentence: str) -> list:
@@ -14,7 +14,7 @@ class Legalpha:
         This function takes in a sentence and returns the embedding of the sentence.
         '''
 
-        return Legalpha.bert.encode_sentences([sentence], combine_strategy='mean').tolist()
+        return self.bert.encode_sentences([sentence], combine_strategy='mean').tolist()
     
     def calculate_sentence_embedding_db(self, question: pd.Series) -> list:
         '''
@@ -31,7 +31,7 @@ class Legalpha:
             return embedding
         else:
             sentence = question.get('text')
-            embedding = Legalpha.bert.encode_sentences(sentence, combine_strategy='mean').tolist()
+            embedding = self.bert.encode_sentences(sentence, combine_strategy='mean').tolist()
             question['embedding'] = embedding
             Question(**question).update()
             return embedding
@@ -110,5 +110,5 @@ class Legalpha:
 
 
 if __name__ == '__main__':
-    legalpha = Legalpha()
+    legalpha = LegalphaSemSearch()
     print(legalpha.predict('What is the procedure for terminating a rental contract?'))

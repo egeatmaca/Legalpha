@@ -1,2 +1,0 @@
-from experiments.LegalphaClf import LegalphaClf
-from experiments.LegalphaBertClf import LegalphaBertClf

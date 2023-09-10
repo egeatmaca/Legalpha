@@ -2,7 +2,7 @@ import pandas as pd
 from pymongo import MongoClient
 import os
 from models import Question, Answer, UserQuestion
-from Legalpha import Legalpha
+from legalpha.LegalphaSemSearch import LegalphaSemSearch as Legalpha
 
 # Set models to inject data for
 MODELS = [Question, Answer, UserQuestion]
