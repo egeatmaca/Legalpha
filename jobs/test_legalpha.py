@@ -1,13 +1,13 @@
 import pandas as pd
 from sklearn.metrics import classification_report
-from legalpha.LegalphaBertClf import LegalphaBertClf
-from legalpha.LegalphaClf import LegalphaClf
-from legalpha.LegalphaSemSearch import LegalphaSemSearch
+from legalpha.Legalpha import Legalpha
+from legalpha.experiments.LegalphaClf import LegalphaClf
+from legalpha.experiments.LegalphaSemSearch import LegalphaSemSearch
 from time import time
 
 
 MODEL_CONSTRUCTORS = {
-    'bert-classifier': LegalphaBertClf,
+    'bert-classifier': Legalpha,
     'classifier': LegalphaClf,
     'semantic-search': LegalphaSemSearch
 }

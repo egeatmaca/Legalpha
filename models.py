@@ -56,7 +56,7 @@ class Model(ABC):
 class Answer(Model):
     __collection__ = 'answers'
 
-    def __init__(self,  id: int, text: str, topic: str = None):
+    def __init__(self,  id: int, text: str = None, topic: str = None):
         self.text = text
         self.topic = topic
         super().__init__(id)
