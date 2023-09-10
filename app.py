@@ -1,10 +1,12 @@
 import numpy as np
+import pandas as pd
 from fastapi import FastAPI, Request, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-from legalpha.LegalphaSemSearch import LegalphaSemSearch as Legalpha
+from legalpha.LegalphaBertClf import LegalphaBertClf as Legalpha
+from models import Answer
 from jobs.inject_data import inject_data
 import utils.feedback
 
@@ -18,27 +20,24 @@ app.mount('/static', static_files, name='static')
 legalpha = Legalpha()
 
 # Initialize response templates
-response_templates = [{'question_pointer': 'As far as I understood, you asked:', 
-                       'answer_pointer': 'According to my knowledge,'},
-                       {'question_pointer': 'I think you asked:',
-                        'answer_pointer': 'I heard from my researcher friends,'},
-                        {'question_pointer': 'I believe you asked:',
-                         'answer_pointer': 'You should know,'},
-                        {'question_pointer': 'So your question is:',
-                            'answer_pointer': 'By reading a lot through the internet, I found out, that',
-                         },]
 
-alternative_response_templates = [{'question_pointer': 'If that was not your question, you might also be asking:',
-                                   'answer_pointer': 'I think you should know that,'},
-                                    {'question_pointer': 'Okay, then let me try again. Do you mean:',
-                                        'answer_pointer': 'I think that would help if you knew,'},
-                                    {'question_pointer': 'Sorry to hear that, I can try again. Perhaps you were asking:', 
-                                     'answer_pointer': 'My answer would be,'},
-                                    {'question_pointer': 'In a second thought, I think you were asking:',
-                                        'answer_pointer': 'In this context, '},]       
+response_templates = ['According to my knowledge,', 
+                      'I heard from my researcher friends,', 
+                      'By reading a lot through the internet, I found out, that,',
+                      'I am not a lawyer, but I think, that,',
+                      'Some websites I have read, say,',
+                      'To answer your question, I have found the following:',
+                      'I have found the following:',
+                      'I have found the following answer regarding your question:']
+
+alternative_response_templates = ['Sorry to hear that, let me try again.', 
+                                  'Sorry to hear that, I can try again.', 
+                                  'Oops, let me try again.', 
+                                  'Oops, trying again...', 
+                                  'In a second thought, you might be looking for this:',
+                                  'My next answer would be:']   
 
 all_templates = response_templates + alternative_response_templates
-all_answer_pointers = [template['answer_pointer'] for template in all_templates]
 
 # Routes
 @app.get('/')
@@ -47,6 +46,7 @@ def index(request: Request):
 
 @app.get('/answer')
 def answer(request: Request):
+    # Get parameters
     try:
         question = request.query_params['question']
 
@@ -54,31 +54,38 @@ def answer(request: Request):
         if 'user_question_id' in request.query_params.keys():
             user_question_id = int(request.query_params['user_question_id'])
 
-        nth_similar = 1
-        if 'nth_similar' in request.query_params.keys():
-            nth_similar = int(request.query_params['nth_similar'])
+        nth_likely = 1
+        if 'nth_likely' in request.query_params.keys():
+            nth_likely = int(request.query_params['nth_likely'])
     except:
         return Response(status_code=400, content='Invalid parameters.')
 
+    # Choose a random response template
     template = None
-    if nth_similar == 1:
+    if nth_likely == 1:
         template = np.random.choice(response_templates)
     else:
         template = np.random.choice(alternative_response_templates)
 
-    answer, answer_id, matched_question = legalpha.predict(question, nth_similar=nth_similar)
+    # Predict answer
+    answer_id = legalpha.predict_nth_likely([question], nth_likely)[0]
     answer_id = int(answer_id) if answer_id is not None else None
 
-    if answer and matched_question:
+    # Get answer text
+    answer = None
+    if answer_id is not None:
+        answer = Answer(id=answer_id).read()['text']
         answer = answer[0].lower() + answer[1:]
-        answer = template['question_pointer'] + ' "' + matched_question + '" ' + template['answer_pointer'] + ' ' + answer
+        answer = template + ' ' + answer
     else:
         answer = 'I am sorry, I could not find an answer to your question.'
 
+    # Create a user question, if not exists
     if user_question_id is None:
         user_question = utils.feedback.create_user_question(question)
         user_question_id = user_question.id
         
+    # Set the last answer of user question
     utils.feedback.set_last_answer(user_question_id, answer_id)
 
     return {'answer': answer, 'answer_id': answer_id, 'user_question_id': user_question_id}
@@ -110,7 +117,8 @@ def about(request: Request):
 
 def run_app():
     inject_data()
-    legalpha.fit()
+    questions = pd.read_csv('data/questions.csv')
+    legalpha.fit(questions['text'], questions['answer_id'])
     uvicorn.run(app, host='0.0.0.0', port=8000)
 
 if __name__ == '__main__':

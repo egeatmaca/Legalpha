@@ -42,7 +42,7 @@ async function getAnswer(input) {
   }
 
   let question = encodeURIComponent(input);
-  let url = "/answer?question=" + question + "&nth_similar=" + (state.retries + 1)
+  let url = "/answer?question=" + question + "&nth_likely=" + (state.retries + 1)
   if (state.last_user_question_id != -1) {
     url += "&user_question_id=" + state.last_user_question_id;
   }
