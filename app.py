@@ -77,7 +77,7 @@ def answer(request: Request):
     answer = None
     if answer_id is not None:
         answer = Answer(id=answer_id).read()['text']
-        answer = answer[0].lower() + answer[1:]
+        answer = answer[0].lower() + answer[1:] if template[-1] == ',' else answer
         answer = template + ' ' + answer
     else:
         answer = 'I am sorry, I could not find an answer to your question.'

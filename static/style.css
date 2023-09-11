@@ -14,6 +14,10 @@ body {
     padding: 10px;
 }
 
+.chat h2 {
+    margin-bottom: 1%;
+}
+
 .messages {
     height: 60vh;
     overflow: auto;
