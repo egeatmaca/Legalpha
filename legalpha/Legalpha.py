@@ -36,7 +36,7 @@ class Legalpha:
         y = self.one_hot_encoder.inverse_transform(y)
         return y
     
-    def predict_nth_likely(self, X, n=1):
+    def predict_nth_likely(self, X, n=1, threshold=0.75):
         if n < 1:
             return np.array([None] * len(X))
 
@@ -47,7 +47,12 @@ class Legalpha:
 
         for _ in range(n - 1):
             y[0, y.argmax(axis=1)] = 0
-        y = self.one_hot_encoder.inverse_transform(y)
+
+        if y.max() > threshold:
+            y = self.one_hot_encoder.inverse_transform(y)
+        else:
+            y = np.array([None] * len(X))
+
         return y
     
     def evaluate(self, X, y):
