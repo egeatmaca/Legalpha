@@ -1,26 +1,18 @@
 import pandas as pd
 from sklearn.metrics import classification_report
-from legalpha.Legalpha import Legalpha
-from legalpha.experiments.LegalphaClf import LegalphaClf
-from legalpha.experiments.LegalphaSemSearch import LegalphaSemSearch
+from sklearn.model_selection import train_test_split
 from time import time
+from utils.ml_jobs import MODEL_CONSTRUCTORS, get_data
 
-
-MODEL_CONSTRUCTORS = {
-    'bert-classifier': Legalpha,
-    'classifier': LegalphaClf,
-    'semantic-search': LegalphaSemSearch
-}
-
-def get_test_data(test_size=0.2, random_state=42):
-    questions = pd.read_csv('./data/questions.csv')
-    answers = pd.read_csv('./data/answers.csv')
-
+def stratified_train_test_split(questions, test_size=0.2, random_state=42, shuffle=True):
     question_list_train = []
     question_list_test = []
     answer_ids = questions['answer_id'].unique()
     for answer_id in answer_ids:
         questions_answer = questions[questions['answer_id'] == answer_id]
+
+        if shuffle:
+            questions_answer = questions_answer.sample(frac=1, random_state=random_state)
 
         test_questions = questions_answer.sample(frac=test_size, random_state=random_state)
         
@@ -33,7 +25,12 @@ def get_test_data(test_size=0.2, random_state=42):
     questions_train = pd.concat(question_list_train)
     questions_test = pd.concat(question_list_test)
 
-    return questions_train, questions_test, answers
+    X_train = questions_train['text']
+    X_test = questions_test['text']
+    y_train = questions_train['answer_id']
+    y_test = questions_test['answer_id']
+
+    return X_train, X_test, y_train, y_test
 
 def predict_all(questions_pred, legalpha):
     answers_pred = []
@@ -45,20 +42,18 @@ def predict_all(questions_pred, legalpha):
 def evaluate(answers_true, answers_predicted):
     return classification_report(answers_true, answers_predicted)
 
-def test_legalpha(model_name='bert-classifier', test_size=0.2, random_state=42):
+def test_legalpha(model_name='bert-embedding-classifier', test_size=0.2, random_state=42):
+    if model_name not in MODEL_CONSTRUCTORS.keys():
+        raise ValueError(f'Invalid model name: {model_name}')
+
     print(f'Test Size: {test_size}')
     print(f'Random State: {random_state}')
 
-    questions_train, questions_test, answers = get_test_data(test_size, random_state)
+    questions, answers = get_data()
+    X_train, X_test, y_train, y_test = stratified_train_test_split(questions, test_size=test_size, random_state=random_state)
 
-    X_train = questions_train['text']
-    y_train = questions_train['answer_id']
-
-    X_test = questions_test['text']
-    y_test = questions_test['answer_id']
-
-    print(f'#Training Questions: {questions_train.shape[0]}')
-    print(f'#Test Questions: {questions_test.shape[0]}')
+    print(f'#Training Questions: {X_train.shape[0]}')
+    print(f'#Test Questions: {X_test.shape[0]}')
     print(f'#Answers: {answers.shape[0]}')
 
     model = MODEL_CONSTRUCTORS[model_name]()
@@ -67,9 +62,10 @@ def test_legalpha(model_name='bert-classifier', test_size=0.2, random_state=42):
     training_start = time()
 
     if model_name == 'semantic-search':
+        questions_train = pd.concat([X_train, y_train], axis=1)
         model.fit(questions_train, answers)
     else:
-        model.fit(X_train, y_train, validation_split=None)
+        model.fit(X_train, y_train)
     
     training_end = time()
     print(f'Training Time: {training_end - training_start} seconds')
@@ -79,6 +75,7 @@ def test_legalpha(model_name='bert-classifier', test_size=0.2, random_state=42):
     
     y_pred = None
     if model_name == 'semantic-search':
+        questions_test = pd.concat([X_test, y_test], axis=1)
         y_pred = predict_all(questions_test, model)
     else:
         y_pred = model.predict(X_test)

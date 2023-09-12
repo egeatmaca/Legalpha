@@ -19,7 +19,7 @@ class LegalphaClf:
         ])
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-    def fit(self, X, y, epochs=100, batch_size=128, validation_split=0.2):
+    def fit(self, X, y, epochs=100, batch_size=128, validation_split=None):
         self.tokenizer.fit_on_texts(X)
         sequences = self.tokenizer.texts_to_sequences(X)
         X = pad_sequences(sequences, maxlen=self.max_len)

@@ -6,11 +6,12 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-from legalpha.Legalpha import Legalpha
+from ml_models import Legalpha
 from models import Answer
-from jobs.inject_data import inject_data
-from jobs.train_legalpha import train_legalpha
+from jobs.db_jobs.inject_data import inject_data
+from jobs.ml_jobs.train_legalpha import train_legalpha
 import utils.feedback
+from utils.random_seed import set_random_seeds
 
 # Initialize FastAPI
 app = FastAPI()
@@ -117,8 +118,11 @@ def handle_feedback(request: Request):
 def about(request: Request):
     return templates.TemplateResponse('about.html', {'request': request})
 
-def run_app():
-    # Inject data
+def run_app(random_seed=42):
+    # Setup random seeds for np and tf
+    set_random_seeds(random_seed)
+
+    # Inject data, if not exists
     inject_data()
 
     # Train Legalpha, if no saved model exists

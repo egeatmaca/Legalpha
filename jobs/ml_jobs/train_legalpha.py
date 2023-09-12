@@ -1,7 +1,7 @@
 import pandas as pd
-from legalpha.Legalpha import Legalpha
 import os
 from time import time
+from ml_models import Legalpha
 
 def train_legalpha(pretrained_path=os.environ.get('LEGALPHA_PRETRAINED_PATH')):
     questions = pd.read_csv('./data/questions.csv')
