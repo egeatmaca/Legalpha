@@ -4,7 +4,7 @@ from time import time
 from utils.ml_jobs import MODEL_CONSTRUCTORS, HYPERPARAM_DISTRIBUTIONS, get_data
 
 
-def tune_legalpha(model_name='bert-embedding-classifier', cv=5, test_size=0.2, random_state=42):
+def tune_legalpha(model_name='bert-embedding-classifier', n_iter=10, cv=5, test_size=0.2, random_state=42):
     if model_name not in MODEL_CONSTRUCTORS.keys():
         raise ValueError(f'Invalid model name: {model_name}')
     
@@ -21,7 +21,7 @@ def tune_legalpha(model_name='bert-embedding-classifier', cv=5, test_size=0.2, r
     randomized_search = RandomizedSearchCV(
         model,
         hyperparam_distribution,
-        n_iter=1,
+        n_iter=n_iter,
         cv=cv,
         random_state=random_state,
         n_jobs=1

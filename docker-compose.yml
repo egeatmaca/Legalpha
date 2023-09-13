@@ -9,7 +9,7 @@ services:
       - .env
     depends_on:
       - db
-    # command: python main.py --tune --model-name bert-embedding-classifier --tune-iters 20 --tune-cv-folds 5
+    command: python main.py --tune --model-name bert-embedding-classifier --tune-iters 1 --tune-cv-folds 5
     # command: python main.py --test --model-name bert-embedding-classifier
     # command: python main.py --train
 

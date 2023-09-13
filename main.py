@@ -18,7 +18,7 @@ if __name__ == '__main__':
     set_random_seeds(RANDOM_SEED)
 
     if args.tune:
-        tune_legalpha(model_name=args.model_name, cv=args.tune_cv_folds, test_size=args.test_size, random_state=RANDOM_SEED)
+        tune_legalpha(model_name=args.model_name, n_iter=args.tune_iters, cv=args.tune_cv_folds, test_size=args.test_size, random_state=RANDOM_SEED)
     elif args.test:
         test_legalpha(model_name=args.model_name, test_size=args.test_size, random_state=RANDOM_SEED)
     elif args.train:
