@@ -42,15 +42,23 @@ def predict_all(questions_pred, legalpha):
 def evaluate(answers_true, answers_predicted):
     return classification_report(answers_true, answers_predicted)
 
-def test_legalpha(model_name='bert-embedding-classifier', test_size=0.2, random_state=42):
+def test_legalpha(model_name='bert-embedding-classifier', test_size=0.2, sampling='random', random_state=42):
     if model_name not in MODEL_CONSTRUCTORS.keys():
         raise ValueError(f'Invalid model name: {model_name}')
 
     print(f'Test Size: {test_size}')
+    print(f'Sampling Method: {sampling}')
     print(f'Random State: {random_state}')
 
     questions, answers = get_data()
-    X_train, X_test, y_train, y_test = stratified_train_test_split(questions, test_size=test_size, random_state=random_state)
+    if sampling == 'random':
+        X = questions['text']
+        y = questions['answer_id']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    elif sampling == 'stratified':
+        X_train, X_test, y_train, y_test = stratified_train_test_split(questions, test_size=test_size, random_state=random_state)
+    else:
+        raise ValueError(f'Invalid sampling method: {sampling}')
 
     print(f'#Training Questions: {X_train.shape[0]}')
     print(f'#Test Questions: {X_test.shape[0]}')

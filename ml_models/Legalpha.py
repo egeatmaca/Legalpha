@@ -5,16 +5,17 @@ from simpletransformers.language_representation import RepresentationModel
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
+from tensorflow.keras.optimizers.experimental import Nadam
 import pickle
 import os
 
 class Legalpha(BaseEstimator, ClassifierMixin):
     bert = RepresentationModel('bert', 'bert-base-uncased', use_cuda=False)
-    optimizers = { 'adam': Adam,  'sgd': SGD, 'rmsprop': RMSprop }
+    optimizers = { 'adam': Adam, 'nadam': Nadam, 'sgd': SGD, 'rmsprop': RMSprop }
     model_folder = 'model'
     one_hot_encoder_file = 'one_hot_encoder.pkl'
 
-    def __init__(self, hidden_layer_sizes=[64], hidden_activation='relu', output_activation='sigmoid', 
+    def __init__(self, hidden_layer_sizes=[64], hidden_activation='leaky_relu', output_activation='softmax', 
                  optimizer='adam', optimizer_learning_rate=0.001, 
                  loss='categorical_crossentropy', metrics=['accuracy'],
                  batch_size=128, epochs=100):
