@@ -17,9 +17,9 @@ class Legalpha(BaseEstimator, ClassifierMixin):
 
     def __init__(self, hidden_layer_sizes=[64], 
                  hidden_activation='relu', output_activation='softmax', 
-                 optimizer='rmsprop', optimizer_learning_rate=0.0001,
+                 optimizer='adam', optimizer_learning_rate=0.001,
                  loss='categorical_crossentropy', metrics=['accuracy'],
-                 batch_size=128, epochs=200,
+                 batch_size=128, epochs=150,
                  embeddings_precalculated=False):
         if metrics is None:
             metrics = ['accuracy']
