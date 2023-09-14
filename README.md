@@ -22,22 +22,15 @@ The scope of this project is limited to tenancy law in Germany for now.
 Submit sample questions about tenancy law to train Legalpha using <a href="https://airtable.com/shrxkifiAiuAFO8Cl
 ">this form</a>.
 
-### Contribute to the task list
+### Contribute to the task
 You can also contribute to the tasks regarding the following topics:
 - Data collection
 - Legal research
 - ML / NLP
-- Frontend
-- Backend
+- Frontend Development
+- Backend Development
 
-To Contribute:
-1. Pick a task from the <a href='https://github.com/egeatmaca/Legalpha/issues'>issue list</a>
-2. Comment on the issue that you want to work on it 
-3. Fork the repository
-4. Create a pull request
-
-Please <a href='https://www.linkedin.com/in/ege-atmaca/'>contact me</a>, if you have any questions regarding the project or the contribution process. <br/>
-Also feel free to create new issues if you have any ideas or suggestions.
+To get started to contribute, please <a href='https://www.linkedin.com/in/ege-atmaca/'>contact me</a>. 
 
 ## How to run the code?
 ### Prerequisites

@@ -1,4 +1,3 @@
-import pandas as pd
 from ml_models import Legalpha
 from ml_models.experiments import LegalphaClf, LegalphaSemSearch
 
@@ -16,12 +15,7 @@ HYPERPARAM_DISTRIBUTIONS = {
         'optimizer': ['adam', 'sgd', 'rmsprop'],
         'optimizer_learning_rate': [0.01, 0.001, 0.0001],
         'loss': ['categorical_crossentropy'],
-        'epochs': [50, 100, 200],
+        'epochs': [50, 100, 150, 200],
         'batch_size': [128]
     }
 }
-
-def get_data():
-    questions = pd.read_csv('./data/questions.csv')
-    answers = pd.read_csv('./data/answers.csv')
-    return questions, answers

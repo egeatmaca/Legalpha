@@ -8,8 +8,8 @@ import uvicorn
 
 from ml_models import Legalpha
 from models import Answer
-from jobs.db_jobs.inject_data import inject_data
-from jobs.ml_jobs.train_legalpha import train_legalpha
+from jobs.db import inject_data
+from jobs.ml import train_legalpha
 import utils.feedback
 from utils.random_seed import set_random_seeds
 

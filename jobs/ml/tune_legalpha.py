@@ -1,7 +1,10 @@
 import pandas as pd
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import RandomizedSearchCV
+# from skopt import BayesSearchCV
 from time import time
-from utils.ml_jobs import MODEL_CONSTRUCTORS, HYPERPARAM_DISTRIBUTIONS, get_data
+from utils.ml.data import get_data
+from utils.ml.models import MODEL_CONSTRUCTORS, HYPERPARAM_DISTRIBUTIONS
 
 
 def tune_legalpha(model_name='bert-embedding-classifier', n_iter=10, cv=5, test_size=0.2, random_state=42):
@@ -11,12 +14,27 @@ def tune_legalpha(model_name='bert-embedding-classifier', n_iter=10, cv=5, test_
     if model_name not in HYPERPARAM_DISTRIBUTIONS.keys():
         raise ValueError(f'Model {model_name} is not supported for hyperparameter tuning')
 
+    # Initialize the model
+    model = MODEL_CONSTRUCTORS[model_name]()
+
+    # Initialize X and y
     questions, _ = get_data()
     X = questions['text']
     y = questions['answer_id']
+    
+    # Precalculate embeddings for BERT Embedding Classifier
+    if model_name == 'bert-embedding-classifier':
+        print('Precalculating embeddings...')
+        embedding_start = time()
+        X = model.bert.encode_sentences(X, combine_strategy='mean')
+        model.embeddings_precalculated = True
+        embedding_end = time()
+        print(f'Embedding Time: {embedding_end - embedding_start} seconds')
+
+    # Split the data into train and test sets
     X_train, _, y_train, _ = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
-    model = MODEL_CONSTRUCTORS[model_name]()
+    # Initialize the hyperparameter search
     hyperparam_distribution = HYPERPARAM_DISTRIBUTIONS[model_name]
     randomized_search = RandomizedSearchCV(
         model,
@@ -27,6 +45,7 @@ def tune_legalpha(model_name='bert-embedding-classifier', n_iter=10, cv=5, test_
         n_jobs=1
     )
 
+    # Run the hyperparameter search
     model_name = model_name.replace('-', ' ').title()
     print(f'Searching the best hyperparameters for {model_name}...')
     search_start = time()
@@ -40,9 +59,10 @@ def tune_legalpha(model_name='bert-embedding-classifier', n_iter=10, cv=5, test_
                     .sort_values(by='mean_test_score', ascending=False) \
                     .reset_index(drop=True)
 
+
+    # Print the results
     print(f'\nBest Hyperparameters for {model_name}:', randomized_search.best_params_, sep='\n')
     print('Best Score:', randomized_search.best_score_)
-    
     print('\n', 'All Results:')
     for i, row in results.iterrows():
         print(f'#{i + 1}:', row.to_dict())

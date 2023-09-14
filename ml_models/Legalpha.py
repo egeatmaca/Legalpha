@@ -15,10 +15,18 @@ class Legalpha(BaseEstimator, ClassifierMixin):
     model_folder = 'model'
     one_hot_encoder_file = 'one_hot_encoder.pkl'
 
-    def __init__(self, hidden_layer_sizes=[64], hidden_activation='leaky_relu', output_activation='softmax', 
-                 optimizer='adam', optimizer_learning_rate=0.001, 
+    # def __init__(self, hidden_layer_sizes=[64], 
+    #              hidden_activation='leaky_relu', output_activation='softmax', 
+    #              optimizer='adam', optimizer_learning_rate=0.001, 
+    #              loss='categorical_crossentropy', metrics=['accuracy'],
+    #              batch_size=128, epochs=100,
+    #              embeddings_precalculated=False):
+    def __init__(self, hidden_layer_sizes=[64, 16], 
+                 hidden_activation='relu', output_activation='softmax', 
+                 optimizer='rmsprop', optimizer_learning_rate=0.0001, 
                  loss='categorical_crossentropy', metrics=['accuracy'],
-                 batch_size=128, epochs=100):
+                 batch_size=128, epochs=150,
+                 embeddings_precalculated=False):
         if metrics is None:
             metrics = ['accuracy']
         elif 'accuracy' not in metrics:
@@ -37,6 +45,7 @@ class Legalpha(BaseEstimator, ClassifierMixin):
         self.metrics = metrics
         self.batch_size = batch_size
         self.epochs = epochs
+        self.embeddings_precalculated = embeddings_precalculated
 
     def generate_model(self):
         model = Sequential()
@@ -54,9 +63,10 @@ class Legalpha(BaseEstimator, ClassifierMixin):
         return model
         
     def fit(self, X, y, validation_split=None):
-        X = self.bert.encode_sentences(X, combine_strategy='mean')
+        if not self.embeddings_precalculated:
+            X = self.bert.encode_sentences(X, combine_strategy='mean')
+        
         y = y.values.reshape(-1, 1)
-
         self.one_hot_encoder = OneHotEncoder()
         self.one_hot_encoder.fit(y)
         y = self.one_hot_encoder.transform(y).toarray()
@@ -66,7 +76,8 @@ class Legalpha(BaseEstimator, ClassifierMixin):
         self.model.fit(X, y, epochs=self.epochs, batch_size=self.batch_size, validation_split=validation_split)
     
     def predict_proba(self, X):
-        X = self.bert.encode_sentences(X, combine_strategy='mean')
+        if not self.embeddings_precalculated:
+            X = self.bert.encode_sentences(X, combine_strategy='mean')
         y = self.model.predict(X)
         return y
     
@@ -95,7 +106,8 @@ class Legalpha(BaseEstimator, ClassifierMixin):
         return y
 
     def evaluate(self, X, y):
-        X = self.bert.encode_sentences(X, combine_strategy='mean')
+        if not self.embeddings_precalculated:
+            X = self.bert.encode_sentences(X, combine_strategy='mean')
         y = self.one_hot_encoder.transform(y.values.reshape(-1, 1)).toarray()
         return self.model.evaluate(X, y)
     

@@ -1,7 +1,7 @@
 import os
 from argparse import ArgumentParser
 from app import run_app
-from jobs.ml_jobs import tune_legalpha, test_legalpha, train_legalpha
+from jobs.ml import tune_legalpha, test_legalpha, train_legalpha
 from utils.random_seed import RANDOM_SEED, set_random_seeds
 
 if __name__ == '__main__':

@@ -1,1 +1,0 @@
-from jobs.db_jobs.inject_data import inject_data
