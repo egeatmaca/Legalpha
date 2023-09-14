@@ -15,17 +15,11 @@ class Legalpha(BaseEstimator, ClassifierMixin):
     model_folder = 'model'
     one_hot_encoder_file = 'one_hot_encoder.pkl'
 
-    # def __init__(self, hidden_layer_sizes=[64], 
-    #              hidden_activation='leaky_relu', output_activation='softmax', 
-    #              optimizer='adam', optimizer_learning_rate=0.001, 
-    #              loss='categorical_crossentropy', metrics=['accuracy'],
-    #              batch_size=128, epochs=100,
-    #              embeddings_precalculated=False):
-    def __init__(self, hidden_layer_sizes=[64, 16], 
+    def __init__(self, hidden_layer_sizes=[64], 
                  hidden_activation='relu', output_activation='softmax', 
-                 optimizer='rmsprop', optimizer_learning_rate=0.0001, 
+                 optimizer='rmsprop', optimizer_learning_rate=0.0001,
                  loss='categorical_crossentropy', metrics=['accuracy'],
-                 batch_size=128, epochs=150,
+                 batch_size=128, epochs=200,
                  embeddings_precalculated=False):
         if metrics is None:
             metrics = ['accuracy']

@@ -5,6 +5,7 @@ from sklearn.model_selection import RandomizedSearchCV
 from time import time
 from utils.ml.data import get_data
 from utils.ml.models import MODEL_CONSTRUCTORS, HYPERPARAM_DISTRIBUTIONS
+import os
 
 
 def tune_legalpha(model_name='bert-embedding-classifier', n_iter=10, cv=5, test_size=0.2, random_state=42):
@@ -63,9 +64,13 @@ def tune_legalpha(model_name='bert-embedding-classifier', n_iter=10, cv=5, test_
     # Print the results
     print(f'\nBest Hyperparameters for {model_name}:', randomized_search.best_params_, sep='\n')
     print('Best Score:', randomized_search.best_score_)
-    print('\n', 'All Results:')
-    for i, row in results.iterrows():
-        print(f'#{i + 1}:', row.to_dict())
+
+    results_folder = os.path.join('ml_models', 'results', 'model_tuning')
+    results_file = model_name.replace(' ', '_').lower() + '.csv'
+    results_file = os.path.join(results_folder, results_file)
+    os.makedirs(results_folder, exist_ok=True)
+    results.to_csv(results_file, index=False)
+    
 
 
 

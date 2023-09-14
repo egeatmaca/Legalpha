@@ -22,7 +22,7 @@ The scope of this project is limited to tenancy law in Germany for now.
 Submit sample questions about tenancy law to train Legalpha using <a href="https://airtable.com/shrxkifiAiuAFO8Cl
 ">this form</a>.
 
-### Contribute to the task
+### Contribute to tasks
 You can also contribute to the tasks regarding the following topics:
 - Data collection
 - Legal research
@@ -30,14 +30,20 @@ You can also contribute to the tasks regarding the following topics:
 - Frontend Development
 - Backend Development
 
-To get started to contribute, please <a href='https://www.linkedin.com/in/ege-atmaca/'>contact me</a>. 
+To contribute, please contact me <a href='https://www.linkedin.com/in/ege-atmaca/'>here</a>. 
 
 ## How to run the code?
 ### Prerequisites
 - Docker
 - Docker Compose
 
-### Run the code
+### Run the server
 1. Clone the repository
 2. Run `docker compose up` in the root directory
 3. Open `localhost:8000` in your browser
+
+### Run ML jobs
+`docker compose up` with respective commands.
+1. Tune hyperparameters: `python main.py --tune --model-name <MODEL_NAME> --tune-iters <ITERS> --tune-cv-folds <FOLDS>`
+2. Test the model with default parameters: `python main.py --test --model-name <MODEL_NAME> --test-size <TEST_FRACTION> --test-sampling <SAMPLING_STRATEGY>`
+3. Train and save the model with default parameters: `python main.py --train`
