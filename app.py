@@ -77,9 +77,11 @@ def answer(request: Request):
     # Get answer text
     answer = None
     if answer_id is not None:
-        answer = Answer(id=answer_id).read()['text']
+        answer_dict = Answer(id=answer_id).read()
+        topic = answer_dict.get('topic')
+        answer = answer_dict.get('text')
         answer = answer[0].lower() + answer[1:] if template[-1] == ',' else answer
-        answer = template + ' ' + answer
+        answer = f'Topic: {topic}<br/><br/>{template} {answer}'
     else:
         answer = 'I am sorry, I could not find an answer to your question.'
 

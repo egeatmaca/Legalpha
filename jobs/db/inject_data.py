@@ -2,6 +2,7 @@ import pandas as pd
 from pymongo import MongoClient
 import os
 from models import Answer, UserQuestion
+from utils.data import read_csv
 
 
 # Set models to inject data for
@@ -22,7 +23,7 @@ def inject_data():
             if not os.path.exists(f'./data/{collection}.csv'):
                 continue
 
-            data = pd.read_csv(f'./data/{collection}.csv').to_dict(orient='records')
+            data = read_csv(f'./data/{collection}.csv').to_dict(orient='records')
 
             # Create records
             for record in data:

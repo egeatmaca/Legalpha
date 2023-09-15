@@ -2,8 +2,8 @@ import pandas as pd
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from time import time
-from utils.ml.data import get_data
-from utils.ml.models import MODEL_CONSTRUCTORS
+from utils.data import get_data
+from utils.ml import MODEL_CONSTRUCTORS
 
 def stratified_train_test_split(questions, test_size=0.2, random_state=42, shuffle=True):
     question_list_train = []

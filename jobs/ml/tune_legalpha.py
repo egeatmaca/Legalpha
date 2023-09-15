@@ -3,8 +3,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import RandomizedSearchCV
 # from skopt import BayesSearchCV
 from time import time
-from utils.ml.data import get_data
-from utils.ml.models import MODEL_CONSTRUCTORS, HYPERPARAM_DISTRIBUTIONS
+from utils.data import get_data
+from utils.ml import MODEL_CONSTRUCTORS, HYPERPARAM_DISTRIBUTIONS
 import os
 
 
