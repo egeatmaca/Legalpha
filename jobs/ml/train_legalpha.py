@@ -1,10 +1,10 @@
-import pandas as pd
 import os
 from time import time
 from ml_models import Legalpha
+from utils.data import read_csv
 
 def train_legalpha(pretrained_path=os.environ.get('LEGALPHA_PRETRAINED_PATH')):
-    questions = pd.read_csv('./data/questions.csv')
+    questions = read_csv('./data/questions.csv')
     answer_ids = questions['answer_id'].unique()
 
     X_train = questions['text']

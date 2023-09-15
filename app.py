@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import pandas as pd
 from fastapi import FastAPI, Request, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
