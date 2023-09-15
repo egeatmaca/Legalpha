@@ -54,6 +54,7 @@ async function getAnswer(input) {
 
 function displayAnswer(answerJson) {
   const topic = answerJson.topic;
+  const topicExists = topic != undefined && topic != null && topic != "";
   const answerFormatted = formatAnswer(answerJson.answer);
 
   document.querySelectorAll(".feedback-container").forEach((e) => e.remove());
@@ -64,18 +65,19 @@ function displayAnswer(answerJson) {
 
   const answerContainer = document.createElement("div");
   answerContainer.classList.add("answer-container");
-  const topicParagraph = document.createElement("p");
-  topicParagraph.classList.add("topic");
-  topicParagraph.innerText = "Topic: " + topic;
+  if (topicExists) {
+    const topicParagraph = document.createElement("p");
+    topicParagraph.classList.add("topic");
+    topicParagraph.innerText = "Topic: " + topic;
+    answerContainer.appendChild(topicParagraph);
+  }
   const answerParagraph = document.createElement("span");
   answerParagraph.classList.add("answer");
   answerParagraph.innerHTML = answerFormatted;
-  answerContainer.appendChild(topicParagraph);
   answerContainer.appendChild(answerParagraph);
   responseMessage.appendChild(answerContainer);
   
-  if (!(answerFormatted.includes("I could not find an answer") || 
-      responses_on_positive.includes(answerFormatted))) {
+  if (topicExists) {
     const thumbsUpButton = document.createElement("button");
     thumbsUpButton.setAttribute("id", "thumbs-up-button");
     thumbsUpButton.classList.add("feedback-button");
@@ -144,7 +146,7 @@ async function onNegativeFeedback() {
   state.retries = state.retries + 1;
 
   const answerJson = await getAnswer(state.last_question);
-  displayAnswer(answerJson.answer);
+  displayAnswer(answerJson);
 
   await fetch(
     "/handle_feedback?user_question_id=" + state.last_user_question_id + "&answer_id=" + state.last_answer_id + "&feedback=0",
@@ -156,9 +158,9 @@ async function onNegativeFeedback() {
 }
 
 async function onPositiveFeedback() {
-  const random_index = Math.floor(Math.random() * responses_on_positive.length);
-  const random_response = responses_on_positive[random_index];
-  displayAnswer(random_response);
+  const randomIndex = Math.floor(Math.random() * responses_on_positive.length);
+  const answerJson = { 'answer': responses_on_positive[randomIndex] };
+  displayAnswer(answerJson);
 
   await fetch(
     "/handle_feedback?user_question_id=" + state.last_user_question_id + "&answer_id=" + state.last_answer_id + "&feedback=1",
