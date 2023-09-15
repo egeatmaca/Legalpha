@@ -3,7 +3,7 @@ from ml_models.experiments import LegalphaClf, LegalphaSemSearch
 
 MODEL_CONSTRUCTORS = {
     'bert-embedding-classifier': Legalpha,
-    'embedding-classifier': LegalphaClf,
+    'legalpha-classifier': LegalphaClf,
     'semantic-search': LegalphaSemSearch
 }
 
