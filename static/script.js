@@ -52,8 +52,9 @@ async function getAnswer(input) {
   return responseJson
 }
 
-function displayAnswer(answer) {
-  const answerFormatted = formatAnswer(answer);
+function displayAnswer(answerJson) {
+  const topic = answerJson.topic;
+  const answerFormatted = formatAnswer(answerJson.answer);
 
   document.querySelectorAll(".feedback-container").forEach((e) => e.remove());
 
@@ -61,9 +62,17 @@ function displayAnswer(answer) {
   responseMessage.classList.add("message");
   responseMessage.classList.add("bot-message");
 
-  const responseText = document.createElement("p");
-  responseText.innerHTML = answerFormatted;
-  responseMessage.appendChild(responseText);
+  const answerContainer = document.createElement("div");
+  answerContainer.classList.add("answer-container");
+  const topicParagraph = document.createElement("p");
+  topicParagraph.classList.add("topic");
+  topicParagraph.innerText = "Topic: " + topic;
+  const answerParagraph = document.createElement("span");
+  answerParagraph.classList.add("answer");
+  answerParagraph.innerHTML = answerFormatted;
+  answerContainer.appendChild(topicParagraph);
+  answerContainer.appendChild(answerParagraph);
+  responseMessage.appendChild(answerContainer);
   
   if (!(answerFormatted.includes("I could not find an answer") || 
       responses_on_positive.includes(answerFormatted))) {
@@ -122,8 +131,7 @@ async function onAsk() {
   state.retries = 0;
 
   const answerJson = await getAnswer(input);
-  console.log(answerJson);
-  displayAnswer(answerJson.answer);
+  displayAnswer(answerJson);
 
   state.last_user_question_id = answerJson.user_question_id;
   state.last_answer = answerJson.answer;

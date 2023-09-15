@@ -74,14 +74,15 @@ def answer(request: Request):
     answer_id = legalpha.predict_nth_likely([question], nth_likely)[0]
     answer_id = int(answer_id) if answer_id is not None else None
 
-    # Get answer text
+    # Get answer
+    topic = None
     answer = None
     if answer_id is not None:
         answer_dict = Answer(id=answer_id).read()
         topic = answer_dict.get('topic')
         answer = answer_dict.get('text')
         answer = answer[0].lower() + answer[1:] if template[-1] == ',' else answer
-        answer = f'Topic: {topic}<br/><br/>{template} {answer}'
+        answer = f'{template} {answer}'
     else:
         answer = 'I am sorry, I could not find an answer to your question.'
 
@@ -93,7 +94,7 @@ def answer(request: Request):
     # Set the last answer of user question
     utils.feedback.set_last_answer(user_question_id, answer_id)
 
-    return {'answer': answer, 'answer_id': answer_id, 'user_question_id': user_question_id}
+    return {'answer': answer, 'answer_id': answer_id, 'topic': topic, 'user_question_id': user_question_id}
 
 @app.put('/handle_feedback')
 def handle_feedback(request: Request):
