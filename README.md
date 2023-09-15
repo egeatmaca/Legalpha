@@ -2,7 +2,7 @@
 
 ## Chatbot for Tenancy Law Questions 🤖 ⚖️
 
-![Image](./screenshots/1.png)
+![Image](./images/screenshot.png)
 
 *** Work in progress ***
 
@@ -47,3 +47,10 @@ To contribute, please contact me <a href='https://www.linkedin.com/in/ege-atmaca
 1. Tune hyperparameters: `python main.py --tune --model-name <MODEL_NAME> --tune-iters <ITERS> --tune-cv-folds <FOLDS>`
 2. Test the model with default parameters: `python main.py --test --model-name <MODEL_NAME> --test-size <TEST_FRACTION> --test-sampling <SAMPLING_STRATEGY>`
 3. Train and save the model with default parameters: `python main.py --train`
+
+## Test Results
+### Random Sampling
+![Image](./images/test_results_random.png)
+
+### Stratified Sampling
+![Image](./images/test_results_stratified.png)
