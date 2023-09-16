@@ -9,8 +9,8 @@ from tensorflow.keras.layers import Dense, Embedding, Bidirectional, LSTM, Layer
 from sklearn.preprocessing import OneHotEncoder
 
 class LegalphaClf:
-    model_folder = 'tf_model'
-    one_hot_encoder_file = 'tf_one_hot_encoder.pkl'
+    model_folder = 'model'
+    one_hot_encoder_file = 'one_hot_encoder.pkl'
 
     def __init__(self, max_words=10000, max_len=500):
         self.max_words = max_words
@@ -29,9 +29,10 @@ class LegalphaClf:
         self.model = Sequential([
             Embedding(self.max_words, 128, input_length=self.max_len),
             Bidirectional(LSTM(64)),
+            LayerNormalization(),
             Dense(32, activation='relu'),
             LayerNormalization(),
-            Dense(y.shape[1], activation='sigmoid'),
+            Dense(y.shape[1], activation='softmax'),
         ])
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         self.model.fit(X, y, epochs=epochs, batch_size=batch_size)
