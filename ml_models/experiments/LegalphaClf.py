@@ -5,7 +5,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, Embedding, Bidirectional, LSTM
+from tensorflow.keras.layers import Dense, Embedding, Bidirectional, LSTM, LayerNormalization
 from sklearn.preprocessing import OneHotEncoder
 
 class LegalphaClf:
@@ -30,6 +30,7 @@ class LegalphaClf:
             Embedding(self.max_words, 128, input_length=self.max_len),
             Bidirectional(LSTM(64)),
             Dense(32, activation='relu'),
+            LayerNormalization(),
             Dense(y.shape[1], activation='sigmoid'),
         ])
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
