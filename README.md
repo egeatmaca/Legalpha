@@ -50,7 +50,7 @@ To contribute, please contact me <a href='https://www.linkedin.com/in/ege-atmaca
 
 ## Test Results
 ### Random Sampling
-![Image](./images/test_results_random.png)
+![Image](./images/test_random_sampling.png)
 
 ### Stratified Sampling
-![Image](./images/test_results_stratified.png)
+![Image](./images/test_stratified_sampling.png)
