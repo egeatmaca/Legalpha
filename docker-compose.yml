@@ -12,6 +12,7 @@ services:
     # command: python main.py --tune --model-name bert-embedding-classifier --tune-iters 50 --tune-cv-folds 5
     # command: python main.py --test --model-name bert-embedding-classifier --test-sampling stratified
     # command: python main.py --train
+    # command: python main.py --export-questions
     # command: sleep infinity
 
   db:
