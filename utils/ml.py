@@ -14,9 +14,6 @@ HYPERPARAM_DISTRIBUTIONS = {
         'output_activation': ['sigmoid', 'softmax'],
         'optimizer': ['adam', 'sgd', 'rmsprop'],
         'optimizer_learning_rate': [0.01, 0.001, 0.0001],
-        'loss': ['categorical_crossentropy'],
-        'epochs': [100, 150, 200],
-        'batch_size': [128]
     }
 }
 

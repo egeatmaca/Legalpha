@@ -15,11 +15,10 @@ class Legalpha(BaseEstimator, ClassifierMixin):
     model_folder = 'model'
     one_hot_encoder_file = 'one_hot_encoder.pkl'
 
-    def __init__(self, hidden_layer_sizes=[64], 
+    def __init__(self, hidden_layer_sizes=[96], 
                  hidden_activation='relu', output_activation='softmax', 
-                 optimizer='adam', optimizer_learning_rate=0.001,
+                 optimizer='adam', optimizer_learning_rate=0.01,
                  loss='categorical_crossentropy', metrics=['accuracy'],
-                 batch_size=128, epochs=150,
                  embeddings_precalculated=False):
         if metrics is None:
             metrics = ['accuracy']
@@ -37,8 +36,6 @@ class Legalpha(BaseEstimator, ClassifierMixin):
         self.optimizer_learning_rate = optimizer_learning_rate
         self.loss = loss
         self.metrics = metrics
-        self.batch_size = batch_size
-        self.epochs = epochs
         self.embeddings_precalculated = embeddings_precalculated
 
     def generate_model(self):
@@ -56,7 +53,7 @@ class Legalpha(BaseEstimator, ClassifierMixin):
 
         return model
         
-    def fit(self, X, y, validation_split=None):
+    def fit(self, X, y, batch_size=128, epochs=150, validation_split=None):
         if not self.embeddings_precalculated:
             X = self.bert.encode_sentences(X, combine_strategy='mean')
         
@@ -67,7 +64,7 @@ class Legalpha(BaseEstimator, ClassifierMixin):
         self.output_layer_size = y.shape[1]
         
         self.model = self.generate_model()
-        self.model.fit(X, y, epochs=self.epochs, batch_size=self.batch_size, validation_split=validation_split)
+        self.model.fit(X, y, epochs=epochs, batch_size=batch_size, validation_split=validation_split)
     
     def predict_proba(self, X):
         if not self.embeddings_precalculated:
