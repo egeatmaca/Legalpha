@@ -1,11 +1,13 @@
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.preprocessing import OneHotEncoder
 from simpletransformers.language_representation import RepresentationModel
 from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, LayerNormalization
+from tensorflow.keras.layers import Dense, Bidirectional, LSTM, LayerNormalization
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 from tensorflow.keras.optimizers.experimental import Nadam
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 import pickle
 import os
 
@@ -15,12 +17,13 @@ class Legalpha(BaseEstimator, ClassifierMixin):
     model_folder = 'model'
     one_hot_encoder_file = 'one_hot_encoder.pkl'
 
-    def __init__(self, hidden_layer_sizes=[128], 
-                 hidden_activation='leaky_relu', output_activation='softmax', 
-                 optimizer='rmsprop', optimizer_learning_rate=0.001,
+    def __init__(self, hidden_layer_sizes=[64, 64], 
+                 hidden_activation='relu', output_activation='softmax', 
+                 optimizer='adam', optimizer_learning_rate=0.001,
                  loss='categorical_crossentropy', metrics=['accuracy'],
-                 layer_normalization=False,
-                 embeddings_precalculated=False):
+                 layer_normalization=True,
+                 embeddings_precalculated=False,
+                 max_len=100):
         if metrics is None:
             metrics = ['accuracy']
         elif 'accuracy' not in metrics:
@@ -39,29 +42,34 @@ class Legalpha(BaseEstimator, ClassifierMixin):
         self.metrics = metrics
         self.layer_normalization = layer_normalization
         self.embeddings_precalculated = embeddings_precalculated
+        self.max_len = max_len
+
+    def encode_sentences(self, X):
+        X = pd.Series(X).apply(lambda x: self.bert.encode_sentences([x])[0])
+        X = pad_sequences(X, maxlen=self.max_len, dtype='float32')
+        return X
 
     def generate_model(self):
         model = Sequential()
-        
-        for i, layer_size in enumerate(self.hidden_layer_sizes):
-            if self.layer_normalization:
-                model.add(LayerNormalization())
 
+        for i, layer_size in enumerate(self.hidden_layer_sizes):
             if i == 0:
-                model.add(Dense(layer_size, activation=self.hidden_activation, input_shape=(768,)))
+                model.add(Bidirectional(LSTM(layer_size), input_shape=(self.max_len, 768)))
             else:
+                if self.layer_normalization:
+                    model.add(LayerNormalization())
                 model.add(Dense(layer_size, activation=self.hidden_activation))
 
-        model.add(Dense(self.output_layer_size, activation='sigmoid'))
+        model.add(Dense(self.output_layer_size, activation=self.output_activation))
 
         model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
 
         return model
         
-    def fit(self, X, y, batch_size=128, epochs=150, validation_split=None):
+    def fit(self, X, y, batch_size=128, epochs=25, validation_split=None):
         if not self.embeddings_precalculated:
-            X = self.bert.encode_sentences(X, combine_strategy='mean')
-        
+            X = self.encode_sentences(X)
+
         y = y.values.reshape(-1, 1)
         self.one_hot_encoder = OneHotEncoder()
         self.one_hot_encoder.fit(y)
@@ -73,7 +81,7 @@ class Legalpha(BaseEstimator, ClassifierMixin):
     
     def predict_proba(self, X):
         if not self.embeddings_precalculated:
-            X = self.bert.encode_sentences(X, combine_strategy='mean')
+            X = self.encode_sentences(X)
         y = self.model.predict(X)
         return y
     

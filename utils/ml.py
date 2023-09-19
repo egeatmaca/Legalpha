@@ -9,11 +9,12 @@ MODEL_CONSTRUCTORS = {
 
 HYPERPARAM_DISTRIBUTIONS = {
     'bert-embedding-classifier': {
-        'hidden_layer_sizes': [[64], [64, 8], [64, 16], [64, 32], [96], [96, 8], [96, 16], [96, 32]],
+        'hidden_layer_sizes': [[64], [96], [128], [64, 16], [64, 32], [96, 16], [96, 32], [128, 16], [128, 32]],
         'hidden_activation': ['relu', 'leaky_relu',],
         'output_activation': ['sigmoid', 'softmax'],
         'optimizer': ['adam', 'sgd', 'rmsprop'],
         'optimizer_learning_rate': [0.01, 0.001, 0.0001],
+        'layer_normalization': [True, False],
     }
 }
 
