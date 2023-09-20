@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('--test-size', type=float, default=0.2, help='Ratio of test data')
     parser.add_argument('--test-sampling', type=str, default='random', help='Sampling method for test data (random or stratified)')
     parser.add_argument('--train', action='store_true', help='Train and save the model (Legalpha BERT Classifier)')
-    parser.add_argument('--model-name', type=str, default='bert-embedding-classifier', help='Model to test')
+    parser.add_argument('--model-name', type=str, default='bert-classifier', help='Model to test')
     parser.add_argument('--export-questions', action='store_true', help='Export user questions')
     args = parser.parse_args()
 

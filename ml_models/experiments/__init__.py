@@ -1,2 +1,3 @@
-from ml_models.experiments.LegalphaClf import LegalphaClf
+from ml_models.experiments.LegalphaEmbedLSTMClf import LegalphaEmbedLSTMClf
+from ml_models.experiments.LegalphaBertLSTMClf import LegalphaBertLSTMClf
 from ml_models.experiments.LegalphaSemSearch import LegalphaSemSearch

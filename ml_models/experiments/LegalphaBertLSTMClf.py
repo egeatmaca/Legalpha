@@ -11,7 +11,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 import pickle
 import os
 
-class Legalpha(BaseEstimator, ClassifierMixin):
+class LegalphaBertLSTMClf(BaseEstimator, ClassifierMixin):
     bert = RepresentationModel('bert', 'bert-base-uncased', use_cuda=False)
     optimizers = { 'adam': Adam, 'nadam': Nadam, 'sgd': SGD, 'rmsprop': RMSprop }
     model_folder = 'model'
@@ -66,7 +66,7 @@ class Legalpha(BaseEstimator, ClassifierMixin):
 
         return model
         
-    def fit(self, X, y, batch_size=128, epochs=25, validation_split=None):
+    def fit(self, X, y, batch_size=128, epochs=20, validation_split=None):
         if not self.embeddings_precalculated:
             X = self.encode_sentences(X)
 

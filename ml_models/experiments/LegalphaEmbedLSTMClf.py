@@ -8,7 +8,7 @@ from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense, Embedding, Bidirectional, LSTM, LayerNormalization
 from sklearn.preprocessing import OneHotEncoder
 
-class LegalphaClf:
+class LegalphaEmbedLSTMClf:
     model_folder = 'model'
     one_hot_encoder_file = 'one_hot_encoder.pkl'
 

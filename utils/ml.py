@@ -1,21 +1,32 @@
 from ml_models import Legalpha
-from ml_models.experiments import LegalphaClf, LegalphaSemSearch
+from ml_models.experiments import LegalphaEmbedLSTMClf, LegalphaSemSearch, LegalphaBertLSTMClf
 
 MODEL_CONSTRUCTORS = {
-    'bert-embedding-classifier': Legalpha,
-    'legalpha-classifier': LegalphaClf,
+    'bert-classifier': Legalpha,
+    'bert-lstm-classifier': LegalphaBertLSTMClf,
+    'embedding-lstm-classifier': LegalphaEmbedLSTMClf,
     'semantic-search': LegalphaSemSearch
 }
 
 HYPERPARAM_DISTRIBUTIONS = {
-    'bert-embedding-classifier': {
+    'bert-classifier': {
         'hidden_layer_sizes': [[64], [96], [128], [64, 16], [64, 32], [96, 16], [96, 32], [128, 16], [128, 32]],
         'hidden_activation': ['relu', 'leaky_relu',],
         'output_activation': ['sigmoid', 'softmax'],
         'optimizer': ['adam', 'sgd', 'rmsprop'],
         'optimizer_learning_rate': [0.01, 0.001, 0.0001],
         'layer_normalization': [True, False],
-    }
+    },
+    'bert-lstm-classifier': {
+        'hidden_layer_sizes': [[64, 16], [64, 32], 
+                               [128, 16], [128, 32], [128, 64],
+                               [256, 16], [256, 32], [256, 64], [256, 128]],  
+        'hidden_activation': ['relu', 'leaky_relu',],
+        'output_activation': ['sigmoid', 'softmax'],
+        'optimizer': ['adam', 'sgd', 'rmsprop'],
+        'optimizer_learning_rate': [0.01, 0.001, 0.0001],
+        'layer_normalization': [True, False],
+    },
 }
 
 def augment_text_data(texts):
