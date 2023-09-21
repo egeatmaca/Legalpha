@@ -40,6 +40,9 @@ class Legalpha(BaseEstimator, ClassifierMixin):
         self.layer_normalization = layer_normalization
         self.embeddings_precalculated = embeddings_precalculated
 
+    def encode_sentences(self, X):
+        return self.bert.encode_sentences(X, combine_strategy='mean')
+
     def generate_model(self):
         model = Sequential()
         
@@ -62,7 +65,7 @@ class Legalpha(BaseEstimator, ClassifierMixin):
         if not self.embeddings_precalculated:
             X = self.bert.encode_sentences(X, combine_strategy='mean')
         
-        y = y.values.reshape(-1, 1)
+        y = np.array(y).reshape(-1, 1)
         self.one_hot_encoder = OneHotEncoder()
         self.one_hot_encoder.fit(y)
         y = self.one_hot_encoder.transform(y).toarray()

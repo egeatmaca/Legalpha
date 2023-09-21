@@ -4,8 +4,9 @@ from sklearn.model_selection import RandomizedSearchCV
 # from skopt import BayesSearchCV
 from time import time
 from utils.data import get_data
-from utils.ml import MODEL_CONSTRUCTORS, HYPERPARAM_DISTRIBUTIONS
+from utils.ml import MODEL_CONSTRUCTORS, HYPERPARAM_DISTRIBUTIONS, BERT_BASED_MODELS, precalculate_embeddings, read_embeddings
 import os
+import json
 
 
 def tune_legalpha(model_name='bert-embedding-classifier', n_iter=10, cv=5, test_size=0.2, random_state=42):
@@ -24,13 +25,18 @@ def tune_legalpha(model_name='bert-embedding-classifier', n_iter=10, cv=5, test_
     y = questions['answer_id']
     
     # Precalculate embeddings for BERT Embedding Classifier
-    if model_name == 'bert-embedding-classifier':
-        print('Precalculating embeddings...')
-        embedding_start = time()
-        X = model.bert.encode_sentences(X, combine_strategy='mean')
+    if model_name in BERT_BASED_MODELS:
+        embeddings_path = os.path.join('data', 'embeddings', f'{model_name}.json')
+        if not os.path.exists(embeddings_path):
+            print('Precalculating embeddings...')
+            embedding_start = time()
+            precalculate_embeddings(model_name=model_name, questions=questions)
+            embedding_end = time()
+            print(f'Embedding Time: {embedding_end - embedding_start} seconds')
+
+        print('Reading embeddings...')
+        X, y = read_embeddings(model_name=model_name)
         model.embeddings_precalculated = True
-        embedding_end = time()
-        print(f'Embedding Time: {embedding_end - embedding_start} seconds')
 
     # Split the data into train and test sets
     X_train, _, y_train, _ = train_test_split(X, y, test_size=test_size, random_state=random_state)

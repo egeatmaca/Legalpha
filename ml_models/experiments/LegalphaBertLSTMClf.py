@@ -17,13 +17,14 @@ class LegalphaBertLSTMClf(BaseEstimator, ClassifierMixin):
     model_folder = 'model'
     one_hot_encoder_file = 'one_hot_encoder.pkl'
 
-    def __init__(self, hidden_layer_sizes=[64, 64], 
+    def __init__(self, lstm_bidirectional=True,
+                 hidden_layer_sizes=[32, 32], 
                  hidden_activation='relu', output_activation='softmax', 
+                 layer_normalization=True,
                  optimizer='adam', optimizer_learning_rate=0.001,
                  loss='categorical_crossentropy', metrics=['accuracy'],
-                 layer_normalization=True,
-                 embeddings_precalculated=False,
-                 max_len=100):
+                 max_len=60,
+                 embeddings_precalculated=False):
         if metrics is None:
             metrics = ['accuracy']
         elif 'accuracy' not in metrics:
@@ -32,15 +33,16 @@ class LegalphaBertLSTMClf(BaseEstimator, ClassifierMixin):
             metrics.remove('accuracy')
             metrics = ['accuracy'] + metrics
 
+        self.lstm_bidirectional = lstm_bidirectional
         self.hidden_layer_sizes = hidden_layer_sizes
         self.hidden_activation = hidden_activation
         self.output_layer_size = None
         self.output_activation = output_activation
+        self.layer_normalization = layer_normalization
         self.optimizer = optimizer
         self.optimizer_learning_rate = optimizer_learning_rate
         self.loss = loss
         self.metrics = metrics
-        self.layer_normalization = layer_normalization
         self.embeddings_precalculated = embeddings_precalculated
         self.max_len = max_len
 
@@ -54,7 +56,10 @@ class LegalphaBertLSTMClf(BaseEstimator, ClassifierMixin):
 
         for i, layer_size in enumerate(self.hidden_layer_sizes):
             if i == 0:
-                model.add(Bidirectional(LSTM(layer_size), input_shape=(self.max_len, 768)))
+                if self.lstm_bidirectional:
+                    model.add(Bidirectional(LSTM(layer_size), input_shape=(self.max_len, 768)))
+                else:
+                    model.add(LSTM(layer_size, input_shape=(self.max_len, 768)))
             else:
                 if self.layer_normalization:
                     model.add(LayerNormalization())
@@ -70,7 +75,7 @@ class LegalphaBertLSTMClf(BaseEstimator, ClassifierMixin):
         if not self.embeddings_precalculated:
             X = self.encode_sentences(X)
 
-        y = y.values.reshape(-1, 1)
+        y = np.array(y).reshape(-1, 1)
         self.one_hot_encoder = OneHotEncoder()
         self.one_hot_encoder.fit(y)
         y = self.one_hot_encoder.transform(y).toarray()
