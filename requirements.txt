@@ -7,4 +7,5 @@ simpletransformers==0.64.3
 tensorflow==2.13.0
 uvicorn==0.23.2
 torch==2.0.1
-# scikit-optimize==0.9.0
+nlpaug==1.1.11
+nltk==3.8.1

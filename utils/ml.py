@@ -1,6 +1,8 @@
+import numpy as np
 import pandas as pd
 import os
 import json
+from nlpaug.augmenter.word.synonym import SynonymAug
 from ml_models import Legalpha
 from ml_models.experiments import LegalphaEmbedLSTMClf, LegalphaSemSearch, LegalphaBertLSTMClf
 from utils.data import get_data
@@ -35,6 +37,7 @@ BERT_BASED_MODELS = ['bert-classifier', 'bert-lstm-classifier']
 
 EMBEDDINGS_DIR = os.path.join('data', 'embeddings')
 
+
 def precalculate_embeddings(model_name='bert-classifier', questions=None):
     if model_name not in BERT_BASED_MODELS:
         raise ValueError('Embeddings can only be precalculated for BERT-based models.')
@@ -64,14 +67,14 @@ def read_embeddings(model_name='bert-classifier'):
     return embeddings, labels
 
 
-def augment_text_data(texts):
-    texts_augmented = []
-
-    for text in texts:
-        words = text.split(' ')
-        n_words = len(words)
-        for i in range(n_words):
-            for j in range(i+1, n_words):
-                texts_augmented.append(' '.join(words[i:j]))
-
-    return texts_augmented
+def augment_data(X, y, n=5):
+        aug = SynonymAug()
+        X, y = np.array(X), np.array(y)
+        X_aug, y_aug = list(X), list(y)
+        for label in np.unique(y):
+            X_of_label = X[y == label]
+            X_aug_of_label = pd.Series(X_of_label).apply(lambda x: aug.augment(x, n=n)).explode()
+            X_aug.extend(X_aug_of_label)
+            y_aug.extend([label] * len(X_aug_of_label))
+        
+        return X_aug, y_aug
