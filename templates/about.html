@@ -5,17 +5,23 @@
     <title> Legalpha - About </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/static/style.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="/static/menu.js"></script>
   </head>
   <body>
-    <div class="header">
-      <h1> Legαlphα 🤖 ⚖️ </h1>
-      <a href="/"> Chat </a>
-      <a href="/about"> About </a>
-      <a href="https://airtable.com/appfIBGA2S3KozQzt/shrNQVeyp2sRGjbzo" target="_blank"> Feedback </a>
-      <a href="https://www.paypal.com/pools/c/8WHcmuvOjB" target="_blank"> Keep Legalpha Running! </a>
+    <div class="topnav">
+      <span class="title">Legαlphα 🤖 ⚖️</span>
+      <div id="myLinks">
+        <a href="/"> Chat </a>
+        <a href="/about"> About </a>
+        <a href="https://airtable.com/appfIBGA2S3KozQzt/shrNQVeyp2sRGjbzo" target="_blank"> Feedback </a>
+      </div>
+      <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">
+        <i class="fa fa-bars"></i>
+      </a>
     </div>
     <div class="chat about">
-      <h2> About </h2>
+      <p class="chat-title"> About </p>
       <div class="messages">
         <div class="message user-message">
           <p> What is Legalpha? </p>
