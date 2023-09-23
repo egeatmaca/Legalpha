@@ -9,8 +9,9 @@ body {
 /* Style the navigation menu */
 .topnav {
     overflow: hidden;
-    padding: 10px;
     text-align: center;
+    padding: 10px;
+    margin-bottom: 10px;
 }
 
 /* Title */
@@ -135,7 +136,7 @@ body {
 }
 
 .about .messages {
-    height: 72.5vh;
+    height: 70vh;
 }
 
 .chat .chat-title {
