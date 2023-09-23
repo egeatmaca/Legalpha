@@ -53,10 +53,10 @@ body {
 }
 
 /* Add a grey background color on mouse-over */
-.topnav a:hover {
+/* .topnav a:hover {
     background-color: #ddd;
     color: #0b1966;
-}
+} */
 
 .chat {
     width: 80vw;
@@ -148,7 +148,7 @@ body {
 .chat .chat-title {
     text-align: center;
     font-size: large;
-    font-weight: bold;
+    font-weight: bolder;
     margin-top: 1%;
     padding-bottom: 1%;
 }
