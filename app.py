@@ -18,6 +18,8 @@ templates = Jinja2Templates(directory='templates')
 static_files = StaticFiles(directory='static')
 app.mount('/static', static_files, name='static')
 
+# CHAT APP
+
 # Initialize Legalpha
 legalpha = Legalpha()
 
@@ -41,7 +43,6 @@ alternative_response_templates = ['Sorry to hear that, let me try again.',
 
 all_templates = response_templates + alternative_response_templates
 
-# Routes
 @app.get('/')
 def index(request: Request):
     return templates.TemplateResponse('index.html', {'request': request})
@@ -114,11 +115,18 @@ def handle_feedback(request: Request):
         return 'No question found to update.'
     
     return 'Feedback received.'
-    
+
+# WEB PAGES
 
 @app.get('/about')
 def about(request: Request):
     return templates.TemplateResponse('about.html', {'request': request})
+
+@app.get('/community')
+def community(request: Request):
+    return templates.TemplateResponse('community.html', {'request': request})
+
+# RUN THE APP
 
 def run_app(random_seed=42):
     # Setup random seeds for np and tf
