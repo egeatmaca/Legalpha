@@ -90,6 +90,10 @@ body {
     width: fit-content;
 }
 
+.message a {
+    color: #ededed;
+}
+
 .user-message {
     text-align: right;
 }
