@@ -10,8 +10,8 @@ body {
 .topnav {
     overflow: hidden;
     text-align: center;
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 1vh 0;
+    margin-bottom: 1vh;
 }
 
 /* Title */
@@ -19,23 +19,27 @@ body {
     font-size: x-large;
     font-weight: bold;
     margin: 2vh 2vw;
-    margin-bottom: 10px;
 }
 
 /* Hide the links inside the navigation menu (except for logo/home) */
 .topnav #myLinks {
     display: none;
     width: 80vw;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 /* Style navigation menu links */
 .topnav a {
     color: white;
-    padding: 14px 16px;
+    padding: 1% 2%;
+    margin-top: 1vh;
     text-decoration: none;
     display: block;
     border-radius: 5px;
+    min-width: fit-content;
 }
 
 /* Style the hamburger menu */
@@ -43,7 +47,9 @@ body {
     display: block;
     position: absolute;
     right: 10vw;
-    top: 1vh;
+    top: 2vh;
+    padding: 1vh 1vh;
+    margin: 0;
 }
 
 /* Add a grey background color on mouse-over */
