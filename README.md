@@ -17,6 +17,10 @@ A chatbot giving easy to digest answers to law questions
 ### Scope
 The scope of this project is limited to tenancy law in Germany for now.
 
+Current topics covered:
+1. Contract termination
+2. Deposit
+
 ## How to contribute?
 ### Contribute to the question dataset
 Submit sample questions about tenancy law to train Legalpha using <a href="https://airtable.com/shrxkifiAiuAFO8Cl
