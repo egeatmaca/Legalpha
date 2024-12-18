@@ -4,8 +4,6 @@
 
 ![Image](./images/screenshot.png)
 
-*** Work in progress ***
-
 ## Problem
 For equal rights, everyone should have equal access to legal information.
 
